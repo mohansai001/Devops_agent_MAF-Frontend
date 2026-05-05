@@ -35,7 +35,7 @@ jobs:
 
       # Archive build output
       - name: Archive Build
-        run: zip -r react-app.zip vida-cortex/build
+        run: zip -r react-app.zip vida-cortex/dist
 
       # Upload artifact
       - name: Upload Artifact
