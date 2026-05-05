@@ -25,16 +25,18 @@ jobs:
 
       # Install dependencies
       - name: Install Dependencies
-        run: npm install
+        working-directory: ./vida-cortex
+        run: npm ci
 
       # Build React app
       - name: Build App
+        working-directory: ./vida-cortex
         run: npm run build
 
       # Archive build output
       - name: Archive Build
         run: |
-          cd build
+          cd vida-cortex/build
           zip -r ../react-app.zip .
 
       # Upload artifact
