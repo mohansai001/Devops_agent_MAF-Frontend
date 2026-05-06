@@ -1,0 +1,79 @@
+name: React CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+env:
+  NODE_VERSION: "18"
+
+jobs:
+  build:
+    name: Build React App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Install dependencies
+      - name: Install Dependencies
+        working-directory: ./vida-cortex
+        run: npm ci
+
+      # Build React app
+      - name: Build App
+        working-directory: ./vida-cortex
+        run: npm run build
+
+      # Archive build output
+      - name: Archive Build
+        run: zip -r react-app.zip vida-cortex/dist
+
+      # Upload artifact
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-app
+          path: react-app.zip
+
+  sast:
+    name: Security Scan (SAST)
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ---------------------------
+      # Semgrep (Code Scan)
+      # ---------------------------
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: "auto"
+
+      # ---------------------------
+      # Gitleaks (Secrets Scan)
+      # ---------------------------
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+      # ---------------------------
+      # Trivy (Dependency Scan)
+      # ---------------------------
+      - name: Run Trivy FS Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          exit-code: 1   # fail if vulnerabilities found
