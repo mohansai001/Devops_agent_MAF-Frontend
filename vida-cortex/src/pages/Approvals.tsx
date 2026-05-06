@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Box, Card, CardContent, Typography, Button, Divider, Collapse, Drawer, Stack, useTheme } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, Divider, Collapse, Stack, useTheme } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -11,7 +11,7 @@ import BuildIcon from '@mui/icons-material/Build';
 import StorageIcon from '@mui/icons-material/Storage';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import CloseIcon from '@mui/icons-material/Close';
+
 import { approvals } from '../data/mockData';
 
 const ACCENT = '#FF4D1C';
@@ -133,121 +133,7 @@ function Arrow({ phase, color }: { phase: AgentPhase; color: string }) {
   );
 }
 
-// ── Single agent node ────────────────────────────────────────
-function AgentNode({ agent, state }: { agent: typeof AGENTS[0]; state: AgentState }) {
-  const Icon = agent.icon;
-  const { phase } = state;
 
-  const isIdle      = phase === 'idle';
-  const isDelegating = phase === 'delegating';
-  const isWorking   = phase === 'working';
-  const isReturning = phase === 'returning';
-  const isDone      = phase === 'done';
-  const isFailed    = phase === 'failed';
-  const isActive    = isDelegating || isWorking || isReturning;
-
-  const borderColor = isDone ? '#059669' : isFailed ? '#DC2626' : isActive ? agent.color : 'rgba(0,0,0,0.08)';
-  const bgColor     = isDone ? 'rgba(5,150,105,0.06)' : isFailed ? 'rgba(220,38,38,0.06)' : isActive ? `${agent.color}10` : 'rgba(255,255,255,0.3)';
-
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0 }}>
-      {/* Arrow */}
-      <Arrow phase={phase} color={agent.color} />
-
-      {/* Return message bubble */}
-      <Box sx={{
-        minHeight: 20, mb: 0.5,
-        opacity: (isDone || isFailed || isReturning) ? 1 : 0,
-        transition: 'opacity 0.4s ease',
-      }}>
-        <Typography sx={{
-          fontSize: 8.5, fontWeight: 700, px: 0.8, py: 0.2, borderRadius: 1,
-          bgcolor: isFailed ? 'rgba(220,38,38,0.08)' : 'rgba(5,150,105,0.08)',
-          color: isFailed ? '#DC2626' : '#059669',
-          border: `1px solid ${isFailed ? 'rgba(220,38,38,0.2)' : 'rgba(5,150,105,0.2)'}`,
-          whiteSpace: 'nowrap',
-        }}>
-          {isFailed ? 'Failed ✗' : state.returnMsg || agent.success}
-        </Typography>
-      </Box>
-
-      {/* Node box */}
-      <Box sx={{
-        width: '100%', p: 1, borderRadius: 2,
-        border: `2px solid ${borderColor}`,
-        bgcolor: bgColor,
-        backdropFilter: 'blur(6px)',
-        transition: 'all 0.3s ease',
-        transform: isActive ? 'translateY(-2px)' : 'none',
-        boxShadow: isActive
-          ? `0 4px 16px ${agent.color}25, 3px 3px 10px rgba(0,0,0,0.06), -3px -3px 10px rgba(255,255,255,0.7)`
-          : `2px 2px 8px rgba(0,0,0,0.05), -2px -2px 8px rgba(255,255,255,0.6)`,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.4,
-        position: 'relative', overflow: 'hidden',
-        minHeight: 72,
-      }}>
-        {/* shimmer when working */}
-        {isWorking && (
-          <Box sx={{
-            position: 'absolute', inset: 0,
-            background: `linear-gradient(90deg, transparent, ${agent.color}18, transparent)`,
-            animation: 'shimmer 1.2s ease-in-out infinite',
-            '@keyframes shimmer': { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
-          }} />
-        )}
-
-        {/* Icon circle */}
-        <Box sx={{
-          width: 28, height: 28, borderRadius: '50%',
-          bgcolor: isIdle ? 'rgba(0,0,0,0.04)' : `${agent.color}18`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          position: 'relative',
-        }}>
-          <Icon sx={{ fontSize: 14, color: isIdle ? '#9CA3AF' : isDone ? '#059669' : isFailed ? '#DC2626' : agent.color }} />
-          {/* pulse ring when active */}
-          {isActive && (
-            <Box sx={{
-              position: 'absolute', inset: -3, borderRadius: '50%',
-              border: `1.5px solid ${agent.color}`,
-              animation: 'ringPulse 1s ease-in-out infinite',
-              '@keyframes ringPulse': { '0%,100%': { opacity: 0.8, transform: 'scale(1)' }, '50%': { opacity: 0.2, transform: 'scale(1.15)' } },
-            }} />
-          )}
-        </Box>
-
-        {/* Label */}
-        <Typography sx={{
-          fontSize: 9, fontWeight: isActive ? 700 : 600, textAlign: 'center', lineHeight: 1.2,
-          color: isIdle ? '#9CA3AF' : isDone ? '#059669' : isFailed ? '#DC2626' : agent.color,
-        }}>
-          {agent.label}
-        </Typography>
-
-        {/* Status line */}
-        <Typography sx={{
-          fontSize: 8, textAlign: 'center', lineHeight: 1.2, color: '#9CA3AF',
-          opacity: isActive ? 1 : 0, transition: 'opacity 0.3s',
-          px: 0.3,
-        }}>
-          {isWorking ? agent.task : isDelegating ? 'Receiving task...' : isReturning ? 'Reporting back...' : ''}
-        </Typography>
-
-        {/* Bottom status badge */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3, mt: 'auto' }}>
-          {isDone    && <CheckCircleIcon sx={{ fontSize: 10, color: '#059669' }} />}
-          {isFailed  && <ErrorIcon sx={{ fontSize: 10, color: '#DC2626' }} />}
-          {isWorking && <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: agent.color, animation: 'dot 0.8s ease-in-out infinite', '@keyframes dot': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.2 } } }} />}
-          <Typography sx={{
-            fontSize: 8, fontWeight: 700,
-            color: isDone ? '#059669' : isFailed ? '#DC2626' : isActive ? agent.color : '#D1D5DB',
-          }}>
-            {isDone ? 'Done' : isFailed ? 'Failed' : isDelegating ? 'Receiving' : isWorking ? 'Working' : isReturning ? 'Returning' : 'Idle'}
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
-  );
-}
 
 // ── Stage stepper + logs ────────────────────────────────────
 type StageStatus = 'done' | 'active' | 'pending' | 'failed';
@@ -358,7 +244,7 @@ function StageStepper({ stageLogs }: { stageLogs: StageLog[] }) {
 }
 
 // ── Live orchestration diagram ───────────────────────────────
-function LiveOrchestration({ repoName }: { repoName: string }) {
+function LiveOrchestration({ repoName: _repoName }: { repoName: string }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   
@@ -376,20 +262,12 @@ function LiveOrchestration({ repoName }: { repoName: string }) {
   // Log panel state
   const [selectedAgentIdx, setSelectedAgentIdx] = useState<number | null>(null);
 
-  // Dummy per-agent logs for demo (replace with real data as needed)
-  const agentLogs: StageLog[][] = AGENTS.map((agent, idx) => [
-    { stage: 'Initialize', status: 'done', logs: ['Initializing agent...', '✓ Ready'] },
-    { stage: 'Run Task', status: 'done', logs: [`${agent.task}`, '✓ Task complete'] },
-    { stage: 'Finalize', status: 'done', logs: ['Finalizing...', '✓ Success'] },
-  ]);
   
   // Real-time logs state
   const [realTimeLogs, setRealTimeLogs] = useState<{ [key: number]: string[] }>({});
   
   // Ref for agent stack scrolling
   const agentStackRef = useRef<HTMLDivElement>(null);
-  const BATCH_SIZE = 5;
-  const [batchIdx, setBatchIdx] = useState(0);
   const [agentStates, setAgentStates] = useState<AgentState[]>(getInitialStates(AGENTS.length));
   const [orchMsg, setOrchMsg] = useState('Initialising pipeline...');
   const [done, setDone] = useState(false);
