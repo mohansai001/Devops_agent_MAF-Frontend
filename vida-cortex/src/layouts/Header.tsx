@@ -18,70 +18,60 @@ export default function Header({ title, sidebarWidth }: Props) {
       position="fixed"
       elevation={0}
       sx={{
+        bgcolor: 'transparent',
+        background: isDark ? 'rgba(15,17,23,0.85)' : 'rgba(243,244,246,0.75)',
         backdropFilter: 'blur(12px)',
-        borderBottom: `1px solid ${isDark ? 'rgba(0,137,123,0.2)' : 'rgba(0,137,123,0.15)'}`,
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.7)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
         left: sidebarWidth,
         width: `calc(100% - ${sidebarWidth}px)`,
         transition: 'left 0.25s, width 0.25s',
         zIndex: 1100,
       }}
     >
-      <Toolbar sx={{ minHeight: 64 }}>
+      <Toolbar sx={{ minHeight: 52 }}>
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" fontWeight={700} color={isDark ? '#e2e8f0' : '#1a202c'}>
+          <Typography variant="h6" fontWeight={700} sx={{ color: '#111827', letterSpacing: '-0.01em', fontSize: '0.85rem' }}>
             {title}
           </Typography>
           <Chip
-            icon={<SmartToyIcon sx={{ fontSize: '14px !important', color: '#5eead4 !important' }} />}
+            icon={<SmartToyIcon sx={{ fontSize: '14px !important', color: '#FF4D1C !important' }} />}
             label="Agent Active"
             size="small"
             sx={{
-              bgcolor: 'rgba(0,137,123,0.12)',
-              color: '#00897b',
-              border: '1px solid rgba(0,137,123,0.25)',
+              bgcolor: 'rgba(255,77,28,0.08)',
+              color: '#FF4D1C',
               fontWeight: 600,
               fontSize: 11,
+              border: 'none',
+              boxShadow: '3px 3px 8px rgba(0,0,0,0.07), -3px -3px 8px rgba(255,255,255,0.7)',
             }}
           />
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          {/* Theme toggle */}
-          <Tooltip title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
-            <IconButton
-              onClick={toggle}
-              sx={{
-                color: isDark ? '#fbbf24' : '#64748b',
-                bgcolor: isDark ? 'rgba(251,191,36,0.08)' : 'rgba(0,0,0,0.04)',
-                border: `1px solid ${isDark ? 'rgba(251,191,36,0.2)' : 'rgba(0,0,0,0.1)'}`,
-                borderRadius: 2,
-                width: 36,
-                height: 36,
-                transition: 'all 0.2s',
-                '&:hover': {
-                  bgcolor: isDark ? 'rgba(251,191,36,0.15)' : 'rgba(0,137,123,0.08)',
-                  color: isDark ? '#fbbf24' : '#00897b',
-                },
-              }}
-            >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Tooltip title={isDark ? 'Light mode' : 'Dark mode'}>
+            <IconButton onClick={toggle} sx={{ color: isDark ? '#F9FAFB' : '#6B7280' }}>
               {isDark ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
             </IconButton>
           </Tooltip>
 
           <Tooltip title="Notifications">
-            <IconButton sx={{ color: isDark ? '#8b949e' : '#64748b', '&:hover': { color: '#00897b' } }}>
+            <IconButton sx={{ color: '#6B7280' }}>
               <NotificationsIcon fontSize="small" />
             </IconButton>
           </Tooltip>
 
           <Avatar
             sx={{
-              width: 32,
-              height: 32,
-              bgcolor: isDark ? 'rgba(0,137,123,0.3)' : '#00897b',
-              border: `1px solid ${isDark ? 'rgba(94,234,212,0.4)' : 'rgba(0,137,123,0.3)'}`,
+              width: 34,
+              height: 34,
+              bgcolor: '#FF4D1C',
               fontSize: 13,
               color: '#fff',
+              fontWeight: 700,
+              boxShadow: '3px 3px 10px rgba(255,77,28,0.3)',
             }}
           >
             JD
@@ -90,7 +80,7 @@ export default function Header({ title, sidebarWidth }: Props) {
           <Tooltip title="Logout">
             <IconButton
               onClick={() => navigate('/login')}
-              sx={{ color: isDark ? '#8b949e' : '#64748b', '&:hover': { color: '#ef4444' } }}
+              sx={{ color: '#6B7280', '&:hover': { color: '#ef4444' } }}
             >
               <LogoutIcon fontSize="small" />
             </IconButton>

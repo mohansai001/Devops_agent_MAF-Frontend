@@ -17,48 +17,68 @@ import {
 import KpiCard from '../components/KpiCard';
 import StatusChip from '../components/StatusChip';
 import { pipelines } from '../data/mockData';
+import { neuShadowSm } from '../data/theme';
+
+const ACCENT = '#FF4D1C';
 
 const kpis = [
-  { title: 'Total Pipelines', value: 10, icon: AllInclusiveIcon, color: '#00897b', bg: 'rgba(0,137,123,0.1)' },
-  { title: 'Queued',          value: 2,  icon: HourglassEmptyIcon, color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
-  { title: 'Running',         value: 3,  icon: PlayCircleIcon,     color: '#3b82f6', bg: 'rgba(59,130,246,0.1)' },
-  { title: 'Successful',      value: 4,  icon: CheckCircleIcon,    color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
-  { title: 'Failed',          value: 1,  icon: CancelIcon,         color: '#ef4444', bg: 'rgba(239,68,68,0.1)'  },
+  { title: 'Total Pipelines', value: 10, icon: AllInclusiveIcon,   color: ACCENT,     bg: 'rgba(255,77,28,0.08)' },
+  { title: 'Queued',          value: 2,  icon: HourglassEmptyIcon, color: '#D97706',  bg: 'rgba(245,158,11,0.08)' },
+  { title: 'Running',         value: 3,  icon: PlayCircleIcon,     color: '#2563EB',  bg: 'rgba(59,130,246,0.08)' },
+  { title: 'Successful',      value: 4,  icon: CheckCircleIcon,    color: '#059669',  bg: 'rgba(16,185,129,0.08)' },
+  { title: 'Failed',          value: 1,  icon: CancelIcon,         color: '#DC2626',  bg: 'rgba(239,68,68,0.08)'  },
 ];
 
 const pieData = [
   { name: 'Success', value: 4 }, { name: 'Running', value: 3 },
   { name: 'Failed',  value: 1 }, { name: 'Queued',  value: 2 },
 ];
-const PIE_COLORS = ['#10b981', '#3b82f6', '#ef4444', '#f59e0b'];
+const PIE_COLORS = ['#059669', '#2563EB', '#DC2626', '#D97706'];
 
 const techData   = [{ name: 'Node.js', count: 3 }, { name: 'Python', count: 2 }, { name: 'Java', count: 2 }, { name: 'Go', count: 2 }];
 const targetData = [{ name: 'AWS EKS', count: 4 }, { name: 'Azure AKS', count: 2 }, { name: 'GCP GKE', count: 2 }];
 const successData = [{ name: 'Success', value: 4 }, { name: 'Failure', value: 1 }];
 
+const tooltipStyle = {
+  backgroundColor: '#fff',
+  border: '1px solid rgba(0,0,0,0.08)',
+  borderRadius: 8,
+  color: '#111827',
+  boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+};
+const tickColor = '#9CA3AF';
+const gridColor = 'rgba(0,0,0,0.05)';
+
+const codeTagSx = {
+  bgcolor: 'rgba(255,77,28,0.07)',
+  color: ACCENT,
+  px: 0.8, py: 0.3,
+  borderRadius: 1,
+  fontSize: 11,
+};
+
 export default function Dashboard() {
   const [tab, setTab] = useState(0);
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-
-  const tooltipStyle = {
-    backgroundColor: theme.palette.background.paper,
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: 8,
-    color: theme.palette.text.primary,
-  };
-  const tickColor   = theme.palette.text.secondary;
-  const gridColor   = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
-  const codeTagSx   = isDark
-    ? { bgcolor: 'rgba(94,234,212,0.08)', color: '#5eead4', border: '1px solid rgba(94,234,212,0.15)' }
-    : { bgcolor: 'rgba(0,137,123,0.08)', color: '#00695c', border: '1px solid rgba(0,137,123,0.2)' };
 
   return (
     <Box>
+      {/* Page heading */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" fontWeight={800} color="#111827" letterSpacing="-0.02em">
+          Pipeline <Box component="span" sx={{ color: ACCENT }}>Overview</Box>
+        </Typography>
+        <Typography variant="body2" color="#6B7280" mt={0.5}>
+          Real-time status of all autonomous CI/CD pipelines
+        </Typography>
+      </Box>
+
+      {/* KPI row */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
         {kpis.map((k) => <KpiCard key={k.title} {...k} />)}
       </Box>
 
+      {/* Main card */}
       <Card>
         <Box sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}>
           <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 2 }}>
@@ -74,25 +94,25 @@ export default function Dashboard() {
                 <TableHead>
                   <TableRow>
                     {['Repository', 'Branch', 'Tech Stack', 'Stage', 'Status', 'App Name', 'Deploy Target', 'Deployed URL', 'Timestamp'].map((h) => (
-                      <TableCell key={h} sx={{ fontWeight: 700, fontSize: 11, color: '#00897b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</TableCell>
+                      <TableCell key={h}>{h}</TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {pipelines.map((p) => (
                     <TableRow key={p.id}>
-                      <TableCell sx={{ fontWeight: 600, color: theme.palette.text.primary }}>{p.repo}</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>{p.repo}</TableCell>
                       <TableCell>
-                        <Box component="code" sx={{ px: 0.8, py: 0.3, borderRadius: 1, fontSize: 11, ...codeTagSx }}>{p.branch}</Box>
+                        <Box component="code" sx={codeTagSx}>{p.branch}</Box>
                       </TableCell>
-                      <TableCell sx={{ color: theme.palette.text.primary }}>{p.techStack}</TableCell>
+                      <TableCell>{p.techStack}</TableCell>
                       <TableCell sx={{ color: theme.palette.text.secondary, fontSize: 12 }}>{p.stage}</TableCell>
                       <TableCell><StatusChip status={p.status} /></TableCell>
-                      <TableCell sx={{ color: theme.palette.text.primary }}>{p.appName}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.primary }}>{p.deployTarget}</TableCell>
+                      <TableCell>{p.appName}</TableCell>
+                      <TableCell>{p.deployTarget}</TableCell>
                       <TableCell>
                         {p.deployedUrl !== '-'
-                          ? <Link href={p.deployedUrl} target="_blank" sx={{ fontSize: 12, color: '#00897b' }}>{p.deployedUrl}</Link>
+                          ? <Link href={p.deployedUrl} target="_blank" sx={{ fontSize: 12, color: ACCENT }}>{p.deployedUrl}</Link>
                           : <Typography variant="caption" color="text.secondary">—</Typography>}
                       </TableCell>
                       <TableCell sx={{ fontSize: 11, color: theme.palette.text.secondary }}>{p.timestamp}</TableCell>
@@ -120,7 +140,7 @@ export default function Dashboard() {
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
                     <Tooltip contentStyle={tooltipStyle} />
-                    <Bar dataKey="count" fill="#00897b" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" fill={ACCENT} radius={[4, 4, 0, 0]} />
                   </BarChart>
                 )},
                 { title: 'Deploy Target Breakdown', chart: (
@@ -129,21 +149,23 @@ export default function Dashboard() {
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
                     <Tooltip contentStyle={tooltipStyle} />
-                    <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 )},
                 { title: 'Success vs Failure', chart: (
                   <PieChart>
                     <Pie data={successData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`} labelLine={{ stroke: tickColor }}>
-                      <Cell fill="#10b981" /><Cell fill="#ef4444" />
+                      <Cell fill="#059669" /><Cell fill="#DC2626" />
                     </Pie>
                     <Tooltip contentStyle={tooltipStyle} />
                     <Legend wrapperStyle={{ color: tickColor, fontSize: 12 }} />
                   </PieChart>
                 )},
               ].map(({ title, chart }) => (
-                <Paper key={title} variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fafafa', border: `1px solid ${theme.palette.divider}` }}>
-                  <Typography variant="caption" fontWeight={700} sx={{ color: '#00897b', textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 2 }}>{title}</Typography>
+                <Paper key={title} sx={{ p: 2.5, boxShadow: neuShadowSm }}>
+                  <Typography variant="caption" fontWeight={700} sx={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 2 }}>
+                    {title}
+                  </Typography>
                   <ResponsiveContainer width="100%" height={220}>{chart}</ResponsiveContainer>
                 </Paper>
               ))}

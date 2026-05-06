@@ -12,6 +12,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import { repositories } from '../data/mockData';
 
+const ACCENT = '#FF4D1C';
+
 export default function Onboarding() {
   const [open, setOpen] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState('https://vida-cortex.io/webhook/');
@@ -25,12 +27,17 @@ export default function Onboarding() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="body2" color="text.secondary">
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" fontWeight={800} color="#111827" letterSpacing="-0.02em">
+          Repository <Box component="span" sx={{ color: ACCENT }}>Onboarding</Box>
+        </Typography>
+        <Typography variant="body2" color="#6B7280" mt={0.5}>
           Register repositories with the VIDA Agent to enable autonomous CI/CD orchestration
         </Typography>
-        <Button variant="contained" startIcon={<SmartToyIcon />} onClick={handleOnboardAll}
-          sx={{ bgcolor: '#00897b', '&:hover': { bgcolor: '#00796b' }, boxShadow: '0 0 20px rgba(0,137,123,0.3)' }}>
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button variant="contained" startIcon={<SmartToyIcon />} onClick={handleOnboardAll}>
           Register All Repos
         </Button>
       </Box>
@@ -41,7 +48,7 @@ export default function Onboarding() {
             <TableHead>
               <TableRow>
                 {['Repository', 'Stars', 'Forks', 'Watchers', 'Open Issues', 'Last Updated', 'Action'].map((h) => (
-                  <TableCell key={h} sx={{ fontWeight: 700, fontSize: 11, color: '#00897b', textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</TableCell>
+                  <TableCell key={h}>{h}</TableCell>
                 ))}
               </TableRow>
             </TableHead>
@@ -51,7 +58,7 @@ export default function Onboarding() {
                   <TableCell sx={{ fontWeight: 600, color: theme.palette.text.primary }}>{repo.name}</TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: theme.palette.text.secondary }}>
-                      <StarIcon sx={{ fontSize: 13, color: '#f59e0b' }} />{repo.stars}
+                      <StarIcon sx={{ fontSize: 13, color: '#D97706' }} />{repo.stars}
                     </Box>
                   </TableCell>
                   <TableCell>
@@ -66,14 +73,13 @@ export default function Onboarding() {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <BugReportIcon sx={{ fontSize: 13, color: repo.openIssues > 0 ? '#ef4444' : theme.palette.text.secondary }} />
-                      <Typography variant="caption" sx={{ color: repo.openIssues > 0 ? '#ef4444' : theme.palette.text.secondary }}>{repo.openIssues}</Typography>
+                      <BugReportIcon sx={{ fontSize: 13, color: repo.openIssues > 0 ? '#DC2626' : theme.palette.text.secondary }} />
+                      <Typography variant="caption" sx={{ color: repo.openIssues > 0 ? '#DC2626' : theme.palette.text.secondary }}>{repo.openIssues}</Typography>
                     </Box>
                   </TableCell>
                   <TableCell sx={{ color: theme.palette.text.secondary, fontSize: 12 }}>{repo.lastUpdated}</TableCell>
                   <TableCell>
-                    <Button size="small" variant="outlined" startIcon={<SmartToyIcon sx={{ fontSize: '14px !important' }} />} onClick={() => handleOnboard(repo.name)}
-                      sx={{ borderColor: 'rgba(0,137,123,0.4)', color: '#00897b', fontSize: 11, '&:hover': { bgcolor: 'rgba(0,137,123,0.08)', borderColor: '#00897b' } }}>
+                    <Button size="small" variant="outlined" startIcon={<SmartToyIcon sx={{ fontSize: '14px !important' }} />} onClick={() => handleOnboard(repo.name)}>
                       Register
                     </Button>
                   </TableCell>
@@ -86,7 +92,7 @@ export default function Onboarding() {
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ fontWeight: 700, color: theme.palette.text.primary, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <SmartToyIcon sx={{ color: '#00897b', fontSize: 20 }} />
+          <SmartToyIcon sx={{ color: ACCENT, fontSize: 20 }} />
           Register: {selectedRepo}
         </DialogTitle>
         <DialogContent>
@@ -97,13 +103,13 @@ export default function Onboarding() {
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setOpen(false)} color="inherit">Cancel</Button>
-          <Button variant="contained" onClick={handleConfirm} sx={{ bgcolor: '#00897b', '&:hover': { bgcolor: '#00796b' } }}>Activate Agent</Button>
+          <Button variant="contained" onClick={handleConfirm}>Activate Agent</Button>
         </DialogActions>
       </Dialog>
 
       <Snackbar open={!!snack} autoHideDuration={5000} onClose={() => setSnack('')} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert severity="success" onClose={() => setSnack('')} icon={<SmartToyIcon fontSize="small" />}
-          sx={{ bgcolor: 'rgba(0,137,123,0.12)', color: '#00695c', border: '1px solid rgba(0,137,123,0.3)', borderRadius: 2, '& .MuiAlert-icon': { color: '#00897b' } }}>
+          sx={{ bgcolor: 'rgba(255,77,28,0.06)', color: ACCENT, border: '1px solid rgba(255,77,28,0.2)', borderRadius: 2, '& .MuiAlert-icon': { color: ACCENT } }}>
           {snack}
         </Alert>
       </Snackbar>

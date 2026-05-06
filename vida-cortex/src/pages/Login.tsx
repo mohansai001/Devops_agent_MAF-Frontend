@@ -7,97 +7,44 @@ export default function Login() {
   const navigate = useNavigate();
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: '#0d1117',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Animated grid background */}
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `
-            linear-gradient(rgba(0,137,123,0.15) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,137,123,0.15) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-          animation: 'gridMove 20s linear infinite',
-          '@keyframes gridMove': {
-            '0%': { backgroundPosition: '0 0' },
-            '100%': { backgroundPosition: '40px 40px' },
-          },
-        }}
-      />
-
-      {/* Glowing orbs */}
-      {[
-        { top: '10%', left: '15%', size: 300 },
-        { top: '60%', right: '10%', size: 200 },
-        { bottom: '5%', left: '40%', size: 250 },
-      ].map((orb, i) => (
-        <Box
-          key={i}
-          sx={{
-            position: 'absolute',
-            width: orb.size,
-            height: orb.size,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(0,137,123,0.2) 0%, transparent 70%)',
-            ...orb,
-            animation: `pulse${i} ${3 + i}s ease-in-out infinite alternate`,
-            [`@keyframes pulse${i}`]: {
-              '0%': { transform: 'scale(1)', opacity: 0.5 },
-              '100%': { transform: 'scale(1.2)', opacity: 1 },
-            },
-          }}
-        />
-      ))}
-
-      {/* Login Card */}
-      <Card
-        sx={{
+    <Box sx={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #e8eaf0 0%, #f3f4f6 40%, #eef0f5 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <Card sx={{
           width: 400,
-          position: 'relative',
-          zIndex: 1,
-          background: 'rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 3,
-        }}
-      >
+          background: 'rgba(255,255,255,0.65)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.75)',
+          boxShadow: '8px 8px 24px rgba(0,0,0,0.09), -8px -8px 24px rgba(255,255,255,0.85)',
+          borderRadius: 4,
+        }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
-            <Box
-              sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #00897b, #00bfa5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mb: 2,
-                boxShadow: '0 0 30px rgba(0,137,123,0.5)',
-              }}
-            >
-              <CloudUploadIcon sx={{ color: '#fff', fontSize: 30 }} />
+            <Box sx={{
+              width: 60, height: 60, borderRadius: 3,
+              bgcolor: '#FF4D1C',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              mb: 2.5,
+              boxShadow: '4px 4px 14px rgba(255,77,28,0.35), -2px -2px 8px rgba(255,255,255,0.6)',
+            }}>
+              <CloudUploadIcon sx={{ color: '#fff', fontSize: 32 }} />
             </Box>
-            <Typography variant="h5" fontWeight={800} color="#fff">VIDA Cortex</Typography>
-            <Typography variant="body2" color="rgba(255,255,255,0.5)" mt={0.5}>
+            <Typography variant="h5" fontWeight={800} color="#111827" letterSpacing="-0.02em">
+              VIDA Cortex
+            </Typography>
+            <Typography variant="body2" color="#6B7280" mt={0.5} textAlign="center">
               AI-Powered DevOps Automation Platform
             </Typography>
           </Box>
 
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', mb: 3 }} />
+          <Divider sx={{ mb: 3 }} />
 
-          <Typography variant="body2" color="rgba(255,255,255,0.6)" textAlign="center" mb={2}>
+          <Typography variant="body2" color="#6B7280" textAlign="center" mb={2.5}>
             Sign in to continue to your workspace
           </Typography>
 
@@ -107,20 +54,12 @@ export default function Login() {
             size="large"
             startIcon={<GitHubIcon />}
             onClick={() => navigate('/dashboard')}
-            sx={{
-              bgcolor: '#24292f',
-              color: '#fff',
-              py: 1.5,
-              fontSize: 15,
-              fontWeight: 600,
-              '&:hover': { bgcolor: '#32383f' },
-              boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-            }}
+            sx={{ py: 1.5, fontSize: '0.95rem' }}
           >
             Login with GitHub
           </Button>
 
-          <Typography variant="caption" color="rgba(255,255,255,0.3)" display="block" textAlign="center" mt={3}>
+          <Typography variant="caption" color="#9CA3AF" display="block" textAlign="center" mt={3}>
             By signing in, you agree to our Terms of Service
           </Typography>
         </CardContent>

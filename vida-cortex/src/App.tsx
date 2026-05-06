@@ -7,6 +7,7 @@ import AppLayout from './layouts/AppLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Approvals from './pages/Approvals';
+import AgentBuilder from './pages/AgentBuilder';
 import Repositories from './pages/Repositories';
 import Onboarding from './pages/Onboarding';
 import Deployments from './pages/Deployments';
@@ -26,6 +27,7 @@ function ThemedApp() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard"       element={<AppLayout><Dashboard /></AppLayout>} />
           <Route path="/approvals"       element={<AppLayout><Approvals /></AppLayout>} />
+          <Route path="/agent-builder"   element={<AppLayout><AgentBuilder /></AppLayout>} />
           <Route path="/repos"           element={<AppLayout><Repositories /></AppLayout>} />
           <Route path="/onboarding"      element={<AppLayout><Onboarding /></AppLayout>} />
           <Route path="/deployments"     element={<AppLayout><Deployments /></AppLayout>} />

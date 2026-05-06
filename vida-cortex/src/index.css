@@ -1,12 +1,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  background-color: #0d1117;
-  color: #e2e8f0;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  /* Soft gradient base — gives glass surfaces something to blur through */
+  background: linear-gradient(135deg, #e8eaf0 0%, #f3f4f6 40%, #eef0f5 100%);
+  min-height: 100vh;
+  color: #111827;
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #161b22; }
-::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #484f58; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.22); }

@@ -10,11 +10,61 @@ export const pipelines = [
 ];
 
 export const approvals = [
-  { id: 1, repo: 'payment-service', branch: 'main', commitSha: 'a1b2c3d', status: 'Running', activeStep: 1, logs: ['[10:00] Agent triggered by push event', '[10:01] Tech stack detected: Node.js', '[10:02] CI pipeline initiated autonomously', '[10:03] Tests passed (42/42)', '[10:04] Proceeding to Terraform stage...'], deployedUrl: 'https://payment.vida.io' },
-  { id: 2, repo: 'auth-api', branch: 'develop', commitSha: 'e4f5g6h', status: 'Running', activeStep: 3, logs: ['[11:00] Agent triggered by push event', '[11:01] Tech stack detected: Python', '[11:02] CI pipeline complete', '[11:03] Terraform plan applied', '[11:04] Agent deploying to AKS...'], deployedUrl: 'https://auth.vida.io' },
-  { id: 3, repo: 'user-service', branch: 'feature/login', commitSha: 'i7j8k9l', status: 'Failed', activeStep: 0, logs: ['[09:00] Agent triggered by push event', '[09:01] Tech stack detected: Java', '[09:02] Build failed: missing dependency — agent flagged for retry'], deployedUrl: '' },
-  { id: 4, repo: 'notification-svc', branch: 'main', commitSha: 'm1n2o3p', status: 'Queued', activeStep: 2, logs: ['[08:00] Agent queued pipeline', '[08:01] Tech stack: Go', '[08:02] CI passed', '[08:03] Agent running Terraform plan...'], deployedUrl: '' },
-  { id: 5, repo: 'order-service', branch: 'develop', commitSha: 'q4r5s6t', status: 'Success', activeStep: 4, logs: ['[07:00] All stages completed by agent', '[07:01] Agent deployed successfully', '[07:02] Health check passed — endpoint live'], deployedUrl: 'https://order.vida.io' },
+  {
+    id: 1, repo: 'payment-service', branch: 'main', commitSha: 'a1b2c3d', status: 'Running', activeStep: 1,
+    stageLogs: [
+      { stage: 'Tech Detection', status: 'done',    logs: ['[10:00] Agent triggered by push event on branch: main', '[10:00] Scanning repository structure...', '[10:01] Detected runtime: Node.js v18', '[10:01] Found package.json — npm project confirmed', '[10:01] Tech stack fingerprint saved ✓'] },
+      { stage: 'CI Pipeline',    status: 'active',  logs: ['[10:02] CI pipeline initiated autonomously', '[10:02] Installing dependencies: npm ci', '[10:03] Running lint checks... passed', '[10:03] Running unit tests (42/42)... passed', '[10:04] Building Docker image vida/payment-service:a1b2c3d', '[10:04] Image pushed to ECR ✓'] },
+      { stage: 'Terraform',      status: 'pending', logs: [] },
+      { stage: 'CD Pipeline',    status: 'pending', logs: [] },
+      { stage: 'GitHub Actions', status: 'pending', logs: [] },
+    ],
+    deployedUrl: 'https://payment.vida.io',
+  },
+  {
+    id: 2, repo: 'auth-api', branch: 'develop', commitSha: 'e4f5g6h', status: 'Running', activeStep: 3,
+    stageLogs: [
+      { stage: 'Tech Detection', status: 'done', logs: ['[11:00] Agent triggered by push event on branch: develop', '[11:00] Detected runtime: Python 3.11', '[11:01] Found requirements.txt — pip project confirmed', '[11:01] Tech stack fingerprint saved ✓'] },
+      { stage: 'CI Pipeline',    status: 'done', logs: ['[11:02] CI pipeline initiated', '[11:02] pip install -r requirements.txt', '[11:03] Running pytest... 87 passed, 0 failed', '[11:03] Coverage: 91% ✓', '[11:04] Docker image built and pushed ✓'] },
+      { stage: 'Terraform',      status: 'done', logs: ['[11:05] Terraform init...', '[11:05] Terraform plan — 3 resources to add', '[11:06] Terraform apply complete ✓', '[11:06] AKS namespace provisioned: auth-api-prod'] },
+      { stage: 'CD Pipeline',    status: 'active', logs: ['[11:07] Deploying to Azure AKS cluster', '[11:07] kubectl apply -f k8s/deployment.yaml', '[11:08] Rolling update in progress (2/3 pods ready)...'] },
+      { stage: 'GitHub Actions', status: 'pending', logs: [] },
+    ],
+    deployedUrl: 'https://auth.vida.io',
+  },
+  {
+    id: 3, repo: 'user-service', branch: 'feature/login', commitSha: 'i7j8k9l', status: 'Failed', activeStep: 0,
+    stageLogs: [
+      { stage: 'Tech Detection', status: 'failed', logs: ['[09:00] Agent triggered by push event on branch: feature/login', '[09:01] Detected runtime: Java 17', '[09:01] Found pom.xml — Maven project confirmed', '[09:02] ERROR: spring-boot-starter-web 3.2.0 not found in Maven Central', '[09:02] Agent flagged pipeline for retry — build aborted ✗'] },
+      { stage: 'CI Pipeline',    status: 'pending', logs: [] },
+      { stage: 'Terraform',      status: 'pending', logs: [] },
+      { stage: 'CD Pipeline',    status: 'pending', logs: [] },
+      { stage: 'GitHub Actions', status: 'pending', logs: [] },
+    ],
+    deployedUrl: '',
+  },
+  {
+    id: 4, repo: 'notification-svc', branch: 'main', commitSha: 'm1n2o3p', status: 'Queued', activeStep: 2,
+    stageLogs: [
+      { stage: 'Tech Detection', status: 'done', logs: ['[08:00] Agent queued pipeline', '[08:01] Detected runtime: Go 1.21', '[08:01] Found go.mod — Go module confirmed ✓'] },
+      { stage: 'CI Pipeline',    status: 'done', logs: ['[08:02] go build ./...', '[08:02] go test ./... — 31 passed ✓', '[08:03] Docker image built and pushed ✓'] },
+      { stage: 'Terraform',      status: 'active', logs: ['[08:04] Terraform init...', '[08:04] Terraform plan — 2 resources to update', '[08:05] Waiting for approval to apply...'] },
+      { stage: 'CD Pipeline',    status: 'pending', logs: [] },
+      { stage: 'GitHub Actions', status: 'pending', logs: [] },
+    ],
+    deployedUrl: '',
+  },
+  {
+    id: 5, repo: 'order-service', branch: 'develop', commitSha: 'q4r5s6t', status: 'Success', activeStep: 4,
+    stageLogs: [
+      { stage: 'Tech Detection', status: 'done', logs: ['[07:00] Detected runtime: Python 3.10', '[07:00] Found requirements.txt ✓'] },
+      { stage: 'CI Pipeline',    status: 'done', logs: ['[07:01] pytest — 54 passed ✓', '[07:01] Docker image pushed ✓'] },
+      { stage: 'Terraform',      status: 'done', logs: ['[07:02] Terraform apply — 0 changes ✓'] },
+      { stage: 'CD Pipeline',    status: 'done', logs: ['[07:03] kubectl rollout complete — 3/3 pods ready ✓', '[07:03] Health check passed ✓'] },
+      { stage: 'GitHub Actions', status: 'done', logs: ['[07:04] Post-deploy smoke tests passed ✓', '[07:04] Agent marked pipeline as SUCCESS', '[07:04] Endpoint live: https://order.vida.io ✓'] },
+    ],
+    deployedUrl: 'https://order.vida.io',
+  },
 ];
 
 export const repositories = [
