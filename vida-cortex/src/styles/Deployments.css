@@ -1,0 +1,158 @@
+/* Deployments Page Styles */
+.deployments-container {
+  /* Main container */
+}
+
+.deployments-header {
+  margin-bottom: 24px;
+}
+
+.deployments-title {
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.deployments-title-accent {
+  color: #FF4D1C;
+}
+
+.deployments-subtitle {
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+/* Table Styles */
+.deployments-table-container {
+  /* Table container */
+}
+
+.deployments-table {
+  /* Table styles */
+}
+
+.table-cell-app {
+  font-weight: 600;
+}
+
+.table-cell-repo {
+  /* Repository cell */
+}
+
+/* Environment Badges */
+.env-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.env-production {
+  background-color: rgba(245,158,11,0.1);
+  color: #D97706;
+}
+
+.env-staging {
+  background-color: rgba(59,130,246,0.1);
+  color: #2563EB;
+}
+
+.env-development {
+  background-color: rgba(107,114,128,0.08);
+  color: #6B7280;
+}
+
+.table-cell-target {
+  /* Deploy target cell */
+}
+
+.region-code {
+  background-color: rgba(0,0,0,0.05);
+  color: #6B7280;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.table-cell-url {
+  font-size: 12px;
+  color: #FF4D1C;
+}
+
+.table-cell-timestamp {
+  font-size: 11px;
+}
+
+.table-cell-empty {
+  /* Empty URL cell */
+}
+
+/* Theme Support */
+.light-theme .deployments-container {
+  background-color: #fff;
+}
+
+.dark-theme .deployments-container {
+  background-color: #1a1a1a;
+}
+
+.light-theme .deployments-title {
+  color: #111827;
+}
+
+.dark-theme .deployments-title {
+  color: #e5e7eb;
+}
+
+.light-theme .deployments-subtitle {
+  color: #6B7280;
+}
+
+.dark-theme .deployments-subtitle {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-app {
+  color: #111;
+}
+
+.dark-theme .table-cell-app {
+  color: #e5e7eb;
+}
+
+.light-theme .table-cell-repo {
+  color: #111;
+}
+
+.dark-theme .table-cell-repo {
+  color: #e5e7eb;
+}
+
+.light-theme .table-cell-target {
+  color: #111;
+}
+
+.dark-theme .table-cell-target {
+  color: #e5e7eb;
+}
+
+.light-theme .table-cell-timestamp {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-timestamp {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-empty {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-empty {
+  color: #9ca3af;
+}
+
+.dark-theme .region-code {
+  background-color: rgba(255,255,255,0.1);
+  color: #9ca3af;
+}

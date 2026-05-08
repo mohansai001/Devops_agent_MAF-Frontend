@@ -1,0 +1,252 @@
+/* Failed Pipelines Page Styles */
+.failed-pipelines-container {
+  /* Main container */
+}
+
+.failed-pipelines-header {
+  margin-bottom: 24px;
+}
+
+.failed-pipelines-title {
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.failed-pipelines-title-accent {
+  color: #FF4D1C;
+}
+
+.failed-pipelines-subtitle {
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+/* Table Styles */
+.failed-table-container {
+  /* Table container */
+}
+
+.failed-table {
+  /* Table styles */
+}
+
+.expand-cell {
+  width: 40px;
+  padding: 4px;
+}
+
+.expand-button {
+  /* Expand button styles */
+}
+
+.table-cell-repo {
+  font-weight: 600;
+}
+
+.branch-code {
+  background-color: rgba(255,77,28,0.07);
+  color: #FF4D1C;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.workflow-code {
+  background-color: rgba(0,0,0,0.05);
+  color: #6B7280;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.failed-job-chip {
+  background-color: rgba(220,38,38,0.08);
+  color: #DC2626;
+  font-weight: 700;
+  font-size: 11px;
+  border: none;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.7);
+}
+
+.table-cell-failed-at {
+  font-size: 11px;
+}
+
+.ai-analyze-button {
+  border-color: rgba(124,58,237,0.3);
+  color: #7C3AED;
+  font-size: 11px;
+}
+
+.ai-analyze-button:hover {
+  background-color: rgba(124,58,237,0.06);
+  border-color: #7C3AED;
+}
+
+/* Collapse Content */
+.collapse-cell {
+  padding: 0;
+  border: none;
+}
+
+.analysis-container {
+  margin: 0 16px 16px 16px;
+  padding: 20px;
+  background-color: rgba(124,58,237,0.04);
+  border-radius: 8px;
+  border: 1px solid rgba(124,58,237,0.15);
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.analysis-icon {
+  color: #7C3AED;
+  font-size: 18px;
+}
+
+.analysis-title {
+  font-weight: 700;
+  color: #7C3AED;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-size: 12px;
+}
+
+/* Failure Reason */
+.failure-section {
+  margin-bottom: 16px;
+}
+
+.section-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.failure-reason-box {
+  background-color: rgba(220,38,38,0.06);
+  border: 1px solid rgba(220,38,38,0.15);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.failure-reason-text {
+  color: #991b1b;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* Analysis Progress */
+.analysis-progress-section {
+  margin-bottom: 16px;
+}
+
+.analysis-progress-text {
+  color: #7C3AED;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 12px;
+}
+
+.analysis-progress-bar {
+  border-radius: 4px;
+  background-color: rgba(124,58,237,0.1);
+}
+
+.analysis-progress-bar .MuiLinearProgress-bar {
+  background: linear-gradient(90deg, #7C3AED, #2563EB);
+}
+
+/* Suggested Fix */
+.suggested-fix-box {
+  background-color: rgba(5,150,105,0.06);
+  border: 1px solid rgba(5,150,105,0.15);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.fix-icon {
+  color: #059669;
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.fix-text {
+  color: #065f46;
+  font-size: 12px;
+}
+
+/* Deep Analysis Button */
+.deep-analysis-button {
+  background-color: #7C3AED;
+}
+
+.deep-analysis-button:hover {
+  background-color: #6D28D9;
+}
+
+/* Theme Support */
+.light-theme .failed-pipelines-container {
+  background-color: #fff;
+}
+
+.dark-theme .failed-pipelines-container {
+  background-color: #1a1a1a;
+}
+
+.light-theme .failed-pipelines-title {
+  color: #111827;
+}
+
+.dark-theme .failed-pipelines-title {
+  color: #e5e7eb;
+}
+
+.light-theme .failed-pipelines-subtitle {
+  color: #6B7280;
+}
+
+.dark-theme .failed-pipelines-subtitle {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-repo {
+  color: #111;
+}
+
+.dark-theme .table-cell-repo {
+  color: #e5e7eb;
+}
+
+.light-theme .table-cell-failed-at {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-failed-at {
+  color: #9ca3af;
+}
+
+.light-theme .section-label {
+  color: #6b7280;
+}
+
+.dark-theme .section-label {
+  color: #9ca3af;
+}
+
+.dark-theme .workflow-code {
+  background-color: rgba(255,255,255,0.1);
+  color: #9ca3af;
+}

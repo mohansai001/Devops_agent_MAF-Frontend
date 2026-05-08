@@ -8,6 +8,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import PublicIcon from '@mui/icons-material/Public';
 import { repositories, langColors } from '../data/mockData';
 import { neuShadow } from '../data/theme';
+import '../styles/Repositories.css';
 
 const ACCENT = '#FF4D1C';
 
@@ -19,67 +20,69 @@ export default function Repositories() {
   const filtered = repositories.filter((r) => r.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={800} color="#111827" letterSpacing="-0.02em">
-          Repository <Box component="span" sx={{ color: ACCENT }}>Explorer</Box>
+    <div className="repositories-container">
+      <div className="repositories-header">
+        <Typography variant="h4" className="repositories-title">
+          Repository <span className="repositories-title-accent">Explorer</span>
         </Typography>
-        <Typography variant="body2" color="#6B7280" mt={0.5}>Browse and manage connected repositories</Typography>
-      </Box>
+        <Typography variant="body2" className="repositories-subtitle">
+          Browse and manage connected repositories
+        </Typography>
+      </div>
 
       <TextField
         placeholder="Search repositories..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         size="small"
-        sx={{ mb: 3, width: 320 }}
+        className="repositories-search"
         InputProps={{
-          startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#9CA3AF', fontSize: 18 }} /></InputAdornment>,
+          startAdornment: <InputAdornment position="start"><SearchIcon className="search-icon" /></InputAdornment>,
         }}
       />
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 2 }}>
+      <div className="repositories-grid">
         {filtered.map((repo) => (
-          <Card key={repo.id} onClick={() => navigate(`/approvals?repo=${encodeURIComponent(repo.name)}`)} sx={{ cursor: 'pointer', boxShadow: neuShadow, '&:hover': { boxShadow: `10px 10px 24px rgba(0,0,0,0.1), -10px -10px 24px rgba(255,255,255,0.85)` } }}>
+          <Card 
+            key={repo.id} 
+            onClick={() => navigate(`/approvals?repo=${encodeURIComponent(repo.name)}`)}
+            className="repository-card"
+            style={{ boxShadow: neuShadow }}
+          >
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                <Typography variant="subtitle2" fontWeight={700} color="text.primary">{repo.name}</Typography>
+              <div className="repo-header">
+                <Typography variant="subtitle2" className="repo-name">{repo.name}</Typography>
                 <Chip
                   icon={repo.visibility === 'Private'
-                    ? <LockIcon sx={{ fontSize: '12px !important', color: 'inherit !important' }} />
-                    : <PublicIcon sx={{ fontSize: '12px !important', color: 'inherit !important' }} />}
+                    ? <LockIcon className="visibility-icon" />
+                    : <PublicIcon className="visibility-icon" />}
                   label={repo.visibility}
                   size="small"
-                  sx={{
-                    bgcolor: repo.visibility === 'Private' ? 'rgba(245,158,11,0.1)' : 'rgba(255,77,28,0.08)',
-                    color: repo.visibility === 'Private' ? '#D97706' : ACCENT,
-                    fontSize: 10, border: 'none',
-                    boxShadow: '2px 2px 6px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.7)',
-                  }}
+                  className={`visibility-chip ${repo.visibility === 'Private' ? 'private' : 'public'}`}
                 />
-              </Box>
+              </div>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <Box sx={{ width: 9, height: 9, borderRadius: '50%', bgcolor: langColors[repo.language] ?? '#6b7280' }} />
-                <Typography variant="caption" color="text.secondary">{repo.language}</Typography>
-                <Box component="code" sx={{ ml: 1, ...branchCodeSx }}>{repo.branch}</Box>
-              </Box>
+              <div className="repo-meta">
+                <div className="language-dot" style={{ backgroundColor: langColors[repo.language] ?? '#6b7280' }} />
+                <Typography variant="caption" className="language-text">{repo.language}</Typography>
+                <code className="branch-code">{repo.branch}</code>
+              </div>
 
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                  <StarIcon sx={{ fontSize: 13, color: '#D97706' }} />
-                  <Typography variant="caption" color="text.secondary">{repo.stars}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                  <ForkRightIcon sx={{ fontSize: 13, color: '#6B7280' }} />
-                  <Typography variant="caption" color="text.secondary">{repo.forks}</Typography>
-                </Box>
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', fontSize: 10 }}>{repo.lastUpdated}</Typography>
-              </Box>
+              <div className="repo-stats">
+                <div className="stat-item">
+                  <StarIcon className="star-icon" />
+                  <Typography variant="caption" className="stat-text">{repo.stars}</Typography>
+                </div>
+                <div className="stat-item">
+                  <ForkRightIcon className="fork-icon" />
+                  <Typography variant="caption" className="stat-text">{repo.forks}</Typography>
+                </div>
+                <Typography variant="caption" className="last-updated">{repo.lastUpdated}</Typography>
+              </div>
             </CardContent>
           </Card>
         ))}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -13,6 +13,8 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import GitHubIcon from '@mui/icons-material/GitHub';
 
 import { approvals } from '../data/mockData';
+import { getCurrentExecution, getWorkflows } from '../data/workflowStore';
+import '../styles/Approvals.css';
 
 const ACCENT = '#FF4D1C';
 
@@ -248,6 +250,27 @@ function LiveOrchestration({ repoName: _repoName }: { repoName: string }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   
+  // Get current workflow execution
+  const currentExecution = getCurrentExecution();
+  const currentWorkflow = currentExecution ? getWorkflows().find(w => w.id === currentExecution.workflowId) : null;
+  
+  // Use workflow agents or fallback to default agents
+  const AGENTS = currentWorkflow?.agents.map((agent, index) => ({
+    label: agent.label,
+    task: agent.task,
+    success: agent.success || `${agent.label} completed successfully`,
+    color: agent.color,
+    icon: AGENT_ICONS[index % AGENT_ICONS.length], // Use default icons for workflow agents
+    key: agent.label,
+    shortName: agent.label.split(' ')[0] // Use first word as short name
+  })) || [
+    { label: 'Code Analysis', task: 'Analyzing code quality and security...', success: 'Code analysis complete — no critical issues found', color: '#3B82F6', icon: SearchIcon, key: 'Code Analysis', shortName: 'Code' },
+    { label: 'Build', task: 'Compiling and building application...', success: 'Build successful — artifacts generated', color: '#10B981', icon: BuildIcon, key: 'Build', shortName: 'Build' },
+    { label: 'Test', task: 'Running automated test suite...', success: 'All tests passed — 98% coverage achieved', color: '#F59E0B', icon: StorageIcon, key: 'Test', shortName: 'Test' },
+    { label: 'Security Scan', task: 'Scanning for vulnerabilities...', success: 'Security scan complete — no vulnerabilities detected', color: '#EF4444', icon: RocketLaunchIcon, key: 'Security Scan', shortName: 'Security' },
+    { label: 'Deploy', task: 'Deploying to staging environment...', success: 'Deployment successful — application is live', color: '#8B5CF6', icon: GitHubIcon, key: 'Deploy', shortName: 'Deploy' },
+  ];
+  
   // Color scheme based on theme
   const colors = {
     bg: isDark ? '#1a1a1a' : '#fff',
@@ -462,7 +485,7 @@ function LiveOrchestration({ repoName: _repoName }: { repoName: string }) {
               )}
               {/* Icon */}
               <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: isIdle ? 'rgba(0,0,0,0.04)' : `${agent.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                <agent.icon sx={{ fontSize: 18, color: isIdle ? '#9CA3AF' : isDone ? '#059669' : isFailed ? '#DC2626' : agent.color }} />
+                <Box component={agent.icon} sx={{ fontSize: 18, color: isIdle ? '#9CA3AF' : isDone ? '#059669' : isFailed ? '#DC2626' : agent.color }} />
                 {isActive && (
                   <Box sx={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `1.5px solid ${agent.color}`, animation: 'ringPulse 1s ease-in-out infinite', '@keyframes ringPulse': { '0%,100%': { opacity: 0.8, transform: 'scale(1)' }, '50%': { opacity: 0.2, transform: 'scale(1.2)' } } }} />
                 )}
@@ -600,24 +623,61 @@ export default function AgentQueue() {
     ? approvals.filter((a) => a.repo === repoFilter)
     : approvals;
 
+  // Get current workflow execution
+  const currentExecution = getCurrentExecution();
+  const currentWorkflow = currentExecution ? getWorkflows().find(w => w.id === currentExecution.workflowId) : null;
+
   const branchCodeSx = { bgcolor: 'rgba(255,77,28,0.07)', color: ACCENT, px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
   const shaCodeSx    = { bgcolor: 'rgba(0,0,0,0.05)', color: '#6B7280', px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {filtered.length === 0 ? (
-        <Box sx={{ p: 4, textAlign: 'center', borderRadius: 2, border: '1px dashed rgba(0,0,0,0.1)' }}>
-          <Typography variant="body2" color="text.secondary">No pipeline found for <strong>{repoFilter}</strong></Typography>
-        </Box>
-      ) : filtered.map((item) => (
-        <Card key={item.id}>
+      {/* Workflow Execution Header */}
+      {currentExecution && currentWorkflow && (
+        <Card sx={{ bgcolor: 'rgba(255,77,28,0.05)', border: '1px solid rgba(255,77,28,0.2)' }}>
+          <CardContent sx={{ py: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box>
+                <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#111', mb: 0.5 }}>
+                  Executing Workflow: {currentWorkflow.name}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  <Typography sx={{ fontSize: 12, color: '#6B7280' }}>Repository:</Typography>
+                  <Box component="code" sx={branchCodeSx}>{currentExecution.repository}</Box>
+                  <Typography sx={{ fontSize: 12, color: '#6B7280' }}>Started:</Typography>
+                  <Typography sx={{ fontSize: 12, color: '#6B7280' }}>
+                    {new Date(currentExecution.startedAt).toLocaleString()}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#6B7280' }}>
+                  Agents ({currentWorkflow.agents.length}):
+                </Typography>
+                {currentWorkflow.agents.slice(0, 3).map((agent, idx) => (
+                  <Box key={idx} sx={{
+                    width: 8, height: 8, borderRadius: '50%', bgcolor: agent.color
+                  }} />
+                ))}
+                {currentWorkflow.agents.length > 3 && (
+                  <Typography sx={{ fontSize: 11, color: '#6B7280' }}>+{currentWorkflow.agents.length - 3}</Typography>
+                )}
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* Show workflow execution or fallback to mock data */}
+      {currentExecution && currentWorkflow ? (
+        // Show live workflow execution
+        <Card>
           <CardContent>
-            {/* Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Typography variant="subtitle1" fontWeight={700}>{item.repo}</Typography>
-                <Box component="code" sx={branchCodeSx}>{item.branch}</Box>
-                <Box component="code" sx={shaCodeSx}>{item.commitSha}</Box>
+                <Typography variant="subtitle1" fontWeight={700}>{currentExecution.repository}</Typography>
+                <Box component="code" sx={branchCodeSx}>main</Box>
+                <Box component="code" sx={shaCodeSx}>live-exec</Box>
               </Box>
             </Box>
 
@@ -632,28 +692,68 @@ export default function AgentQueue() {
               <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8, p: 2, pb: 0 }}>
                 Live Orchestration Flow
               </Typography>
-              <LiveOrchestration repoName={item.repo} />
+              <LiveOrchestration repoName={currentExecution.repository} />
             </Box>
-
-            {/* Stage stepper + logs */}
-            <Divider sx={{ my: 2 }} />
-            <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8, mb: 1.5 }}>
-              Stage Execution Detail
-            </Typography>
-            <StageStepper stageLogs={item.stageLogs as StageLog[]} />
-
-            {item.deployedUrl && (
-              <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8 }}>Deployed Endpoint:</Typography>
-                <Button size="small" endIcon={<OpenInNewIcon sx={{ fontSize: '12px !important' }} />} href={item.deployedUrl} target="_blank"
-                  sx={{ color: ACCENT, fontSize: 12, p: 0, minWidth: 0, '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' } }}>
-                  {item.deployedUrl}
-                </Button>
-              </Box>
-            )}
           </CardContent>
         </Card>
-      ))}
+      ) : (
+        // Show mock data when no workflow is executing
+        <>
+          {filtered.length === 0 ? (
+            <Box sx={{ p: 4, textAlign: 'center', borderRadius: 2, border: '1px dashed rgba(0,0,0,0.1)' }}>
+              <Typography variant="body2" color="text.secondary">
+                {repoFilter ? `No pipeline found for ${repoFilter}` : 'No active pipelines. Execute a workflow from the Workflows page to see live orchestration.'}
+              </Typography>
+            </Box>
+          ) : (
+            filtered.map((item) => (
+              <Card key={item.id}>
+                <CardContent>
+                  {/* Header */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <Typography variant="subtitle1" fontWeight={700}>{item.repo}</Typography>
+                      <Box component="code" sx={branchCodeSx}>{item.branch}</Box>
+                      <Box component="code" sx={shaCodeSx}>{item.commitSha}</Box>
+                    </Box>
+                  </Box>
+
+                  {/* Live orchestration diagram */}
+                  <Box sx={{
+                    borderRadius: 2,
+                    bgcolor: 'rgba(255,255,255,0.45)',
+                    border: '1px solid rgba(255,255,255,0.65)',
+                    backdropFilter: 'blur(8px)',
+                    overflow: 'hidden',
+                  }}>
+                    <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8, p: 2, pb: 0 }}>
+                      Live Orchestration Flow
+                    </Typography>
+                    <LiveOrchestration repoName={item.repo} />
+                  </Box>
+
+                  {/* Stage stepper + logs */}
+                  <Divider sx={{ my: 2 }} />
+                  <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8, mb: 1.5 }}>
+                    Stage Execution Detail
+                  </Typography>
+                  <StageStepper stageLogs={item.stageLogs as StageLog[]} />
+
+                  {item.deployedUrl && (
+                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8 }}>Deployed Endpoint:</Typography>
+                      <Button size="small" endIcon={<OpenInNewIcon sx={{ fontSize: '12px !important' }} />} href={item.deployedUrl} target="_blank"
+                        sx={{ color: ACCENT, fontSize: 12, p: 0, minWidth: 0, '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' } }}>
+                        {item.deployedUrl}
+                      </Button>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </>
+      )}
     </Box>
   );
 }

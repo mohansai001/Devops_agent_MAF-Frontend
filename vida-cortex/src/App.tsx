@@ -12,6 +12,7 @@ import Repositories from './pages/Repositories';
 import Onboarding from './pages/Onboarding';
 import Deployments from './pages/Deployments';
 import Builds from './pages/Builds';
+import Workflows from './pages/Workflows';
 import FailedPipelines from './pages/FailedPipelines';
 
 function ThemedApp() {
@@ -32,6 +33,7 @@ function ThemedApp() {
           <Route path="/onboarding"      element={<AppLayout><Onboarding /></AppLayout>} />
           <Route path="/deployments"     element={<AppLayout><Deployments /></AppLayout>} />
           <Route path="/builds"          element={<AppLayout><Builds /></AppLayout>} />
+          <Route path="/workflows"        element={<AppLayout><Workflows /></AppLayout>} />
           <Route path="/failed-pipelines" element={<AppLayout><FailedPipelines /></AppLayout>} />
         </Routes>
       </BrowserRouter>

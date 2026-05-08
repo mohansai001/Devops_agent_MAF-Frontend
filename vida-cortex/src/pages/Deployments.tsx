@@ -2,6 +2,7 @@ import { Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, Tabl
 import { useTheme } from '@mui/material/styles';
 import StatusChip from '../components/StatusChip';
 import { deployments } from '../data/mockData';
+import '../styles/Deployments.css';
 
 const ACCENT = '#FF4D1C';
 
@@ -15,19 +16,23 @@ const regionCodeSx = { bgcolor: 'rgba(0,0,0,0.05)', color: '#6B7280', px: 0.8, p
 
 export default function Deployments() {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const containerClass = `deployments-container ${isDark ? 'dark-theme' : 'light-theme'}`;
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={800} color="#111827" letterSpacing="-0.02em">
-          Deployment <Box component="span" sx={{ color: ACCENT }}>Tracker</Box>
+    <div className={containerClass}>
+      <div className="deployments-header">
+        <Typography variant="h4" className={`deployments-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          Deployment <span className="deployments-title-accent">Tracker</span>
         </Typography>
-        <Typography variant="body2" color="#6B7280" mt={0.5}>Live deployment status across all environments</Typography>
-      </Box>
+        <Typography variant="body2" className={`deployments-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          Live deployment status across all environments
+        </Typography>
+      </div>
 
       <Card>
-        <TableContainer>
-          <Table>
+        <TableContainer className="deployments-table-container">
+          <Table className="deployments-table">
             <TableHead>
               <TableRow>
                 {['App Name', 'Repository', 'Environment', 'Status', 'Deploy Target', 'Region', 'Deployed URL', 'Timestamp'].map((h) => (
@@ -40,22 +45,25 @@ export default function Deployments() {
                 const env = envStyle[d.environment] ?? envStyle.Development;
                 return (
                   <TableRow key={d.id}>
-                    <TableCell sx={{ fontWeight: 600, color: theme.palette.text.primary }}>{d.appName}</TableCell>
-                    <TableCell sx={{ color: theme.palette.text.primary }}>{d.repo}</TableCell>
+                    <TableCell className={`table-cell-app ${isDark ? 'dark-theme' : 'light-theme'}`}>{d.appName}</TableCell>
+                    <TableCell className={`table-cell-repo ${isDark ? 'dark-theme' : 'light-theme'}`}>{d.repo}</TableCell>
                     <TableCell>
-                      <Typography variant="caption" sx={{ bgcolor: env.bg, color: env.color, px: 1, py: 0.3, borderRadius: 1, fontWeight: 600 }}>
+                      <Typography 
+                        variant="caption" 
+                        className={`env-badge env-${d.environment.toLowerCase()}`}
+                      >
                         {d.environment}
                       </Typography>
                     </TableCell>
                     <TableCell><StatusChip status={d.status} /></TableCell>
-                    <TableCell sx={{ color: theme.palette.text.primary }}>{d.deployTarget}</TableCell>
-                    <TableCell><Box component="code" sx={regionCodeSx}>{d.region}</Box></TableCell>
+                    <TableCell className={`table-cell-target ${isDark ? 'dark-theme' : 'light-theme'}`}>{d.deployTarget}</TableCell>
+                    <TableCell><code className={`region-code ${isDark ? 'dark-theme' : 'light-theme'}`}>{d.region}</code></TableCell>
                     <TableCell>
                       {d.deployedUrl !== '-'
-                        ? <Link href={d.deployedUrl} target="_blank" sx={{ fontSize: 12, color: ACCENT }}>{d.deployedUrl}</Link>
-                        : <Typography variant="caption" color="text.secondary">—</Typography>}
+                        ? <Link href={d.deployedUrl} target="_blank" className="table-cell-url">{d.deployedUrl}</Link>
+                        : <Typography variant="caption" className={`table-cell-empty ${isDark ? 'dark-theme' : 'light-theme'}`}>—</Typography>}
                     </TableCell>
-                    <TableCell sx={{ fontSize: 11, color: theme.palette.text.secondary }}>{d.timestamp}</TableCell>
+                    <TableCell className={`table-cell-timestamp ${isDark ? 'dark-theme' : 'light-theme'}`}>{d.timestamp}</TableCell>
                   </TableRow>
                 );
               })}
@@ -63,6 +71,6 @@ export default function Deployments() {
           </Table>
         </TableContainer>
       </Card>
-    </Box>
+    </div>
   );
 }

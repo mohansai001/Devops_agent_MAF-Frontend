@@ -2,6 +2,7 @@ import { Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, Tabl
 import { useTheme } from '@mui/material/styles';
 import StatusChip from '../components/StatusChip';
 import { builds } from '../data/mockData';
+import '../styles/Builds.css';
 
 const ACCENT = '#FF4D1C';
 
@@ -10,20 +11,24 @@ const workflowCodeSx = { bgcolor: 'rgba(0,0,0,0.05)', color: '#6B7280', px: 0.8,
 
 export default function Builds() {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const containerClass = `builds-container ${isDark ? 'dark-theme' : 'light-theme'}`;
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={800} color="#111827" letterSpacing="-0.02em">
-          Build <Box component="span" sx={{ color: ACCENT }}>History</Box>
+    <div className={containerClass}>
+      <div className="builds-header">
+        <Typography variant="h4" className={`builds-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          Build <span className="builds-title-accent">History</span>
         </Typography>
-        <Typography variant="body2" color="#6B7280" mt={0.5}>CI workflow runs across all repositories</Typography>
-      </Box>
+        <Typography variant="body2" className={`builds-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          CI workflow runs across all repositories
+        </Typography>
+      </div>
 
       <Card>
-        <TableContainer>
-          <Table>
-            <TableHead>
+        <TableContainer className="builds-table-container">
+          <Table className="builds-table">
+            <TableHead className="table-header">
               <TableRow>
                 {['Repository', 'Branch', 'Workflow', 'Status', 'Duration', 'Triggered At'].map((h) => (
                   <TableCell key={h}>{h}</TableCell>
@@ -33,18 +38,18 @@ export default function Builds() {
             <TableBody>
               {builds.map((b) => (
                 <TableRow key={b.id}>
-                  <TableCell sx={{ fontWeight: 600, color: theme.palette.text.primary }}>{b.repo}</TableCell>
-                  <TableCell><Box component="code" sx={branchCodeSx}>{b.branch}</Box></TableCell>
-                  <TableCell><Box component="code" sx={workflowCodeSx}>{b.workflow}</Box></TableCell>
+                  <TableCell className={`table-cell-repo ${isDark ? 'dark-theme' : 'light-theme'}`}>{b.repo}</TableCell>
+                  <TableCell><code className="branch-code">{b.branch}</code></TableCell>
+                  <TableCell><code className={`workflow-code ${isDark ? 'dark-theme' : 'light-theme'}`}>{b.workflow}</code></TableCell>
                   <TableCell><StatusChip status={b.status} /></TableCell>
-                  <TableCell sx={{ color: theme.palette.text.primary, fontSize: 12, fontFamily: 'monospace' }}>{b.duration}</TableCell>
-                  <TableCell sx={{ fontSize: 11, color: theme.palette.text.secondary }}>{b.triggeredAt}</TableCell>
+                  <TableCell className={`table-cell-duration ${isDark ? 'dark-theme' : 'light-theme'}`}>{b.duration}</TableCell>
+                  <TableCell className={`table-cell-triggered ${isDark ? 'dark-theme' : 'light-theme'}`}>{b.triggeredAt}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Card>
-    </Box>
+    </div>
   );
 }

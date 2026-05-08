@@ -1,0 +1,211 @@
+/* Workflows Page Styles */
+.workflows-container {
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.workflows-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.workflows-title {
+  font-weight: 800;
+  margin-bottom: 24px;
+  font-size: 1.5rem;
+}
+
+/* Empty State */
+.workflows-empty-card {
+  border: 1px solid;
+}
+
+.workflows-empty-text {
+  text-align: center;
+  padding: 32px 0;
+  font-style: italic;
+}
+
+/* Workflow List */
+.workflows-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workflow-card {
+  border: 1px solid;
+}
+
+.workflow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.workflow-info {
+  /* Workflow info section */
+}
+
+.workflow-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.workflow-created {
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.workflow-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.execute-button {
+  background-color: #FF4D1C;
+  color: white;
+  font-size: 0.75rem;
+  padding: 4px 16px;
+}
+
+.execute-button:hover {
+  background-color: #e63946;
+}
+
+.delete-button {
+  color: #DC2626;
+}
+
+.delete-button:hover {
+  background-color: rgba(220,38,38,0.1);
+}
+
+/* Agents Section */
+.workflow-agents {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.agents-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.agent-chip {
+  font-weight: 600;
+  font-size: 0.65rem;
+}
+
+/* Execute Dialog */
+.execute-dialog-title {
+  /* Dialog title styles */
+}
+
+.execute-dialog-content {
+  /* Dialog content styles */
+}
+
+.repo-select {
+  margin-top: 16px;
+}
+
+.execute-dialog-actions {
+  /* Dialog actions styles */
+}
+
+.cancel-button {
+  /* Cancel button styles */
+}
+
+.confirm-execute-button {
+  background-color: #FF4D1C;
+}
+
+.confirm-execute-button:hover {
+  background-color: #e63946;
+}
+
+.confirm-execute-button:disabled {
+  background-color: rgba(255,77,28,0.3);
+}
+
+/* Theme Support */
+.light-theme .workflows-container {
+  background-color: #f8fafc;
+}
+
+.dark-theme .workflows-container {
+  background-color: #0f0f0f;
+}
+
+.light-theme .workflows-empty-card {
+  background-color: #fff;
+  border-color: rgba(0,0,0,0.1);
+}
+
+.dark-theme .workflows-empty-card {
+  background-color: #1a1a1a;
+  border-color: #374151;
+}
+
+.light-theme .workflows-empty-text {
+  color: #6b7280;
+}
+
+.dark-theme .workflows-empty-text {
+  color: #9ca3af;
+}
+
+.light-theme .workflow-card {
+  background-color: #fff;
+  border-color: rgba(0,0,0,0.1);
+}
+
+.dark-theme .workflow-card {
+  background-color: #1a1a1a;
+  border-color: #374151;
+}
+
+.light-theme .workflows-title {
+  color: #111;
+}
+
+.dark-theme .workflows-title {
+  color: #e5e7eb;
+}
+
+.light-theme .workflow-name {
+  color: #111;
+}
+
+.dark-theme .workflow-name {
+  color: #e5e7eb;
+}
+
+.light-theme .workflow-created {
+  color: #6b7280;
+}
+
+.dark-theme .workflow-created {
+  color: #9ca3af;
+}
+
+.light-theme .agents-label {
+  color: #6b7280;
+}
+
+.dark-theme .agents-label {
+  color: #9ca3af;
+}
+
+.light-theme .execute-dialog-title {
+  color: #111;
+}
+
+.dark-theme .execute-dialog-title {
+  color: #e5e7eb;
+}

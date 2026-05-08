@@ -1,0 +1,160 @@
+/* Dashboard Styles */
+.dashboard-container {
+  /* Main container styles */
+}
+
+.dashboard-header {
+  margin-bottom: 24px;
+}
+
+.dashboard-title {
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-title-accent {
+  color: #FF4D1C;
+}
+
+.dashboard-subtitle {
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+/* KPI Row */
+.kpi-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* Main Card */
+.main-card-tabs {
+  border-bottom: 1px solid;
+  padding: 0 16px;
+}
+
+.main-card-content {
+  padding: 0;
+}
+
+/* Table Styles */
+.pipelines-table {
+  /* Table container styles */
+}
+
+.table-cell-repo {
+  font-weight: 600;
+}
+
+.branch-code {
+  background-color: rgba(255,77,28,0.07);
+  color: #FF4D1C;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.table-cell-stage {
+  font-size: 12px;
+}
+
+.table-cell-url {
+  font-size: 12px;
+  color: #FF4D1C;
+}
+
+.table-cell-timestamp {
+  font-size: 11px;
+}
+
+.table-cell-empty {
+  /* Empty cell styles */
+}
+
+/* Reports Grid */
+.reports-grid {
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.chart-paper {
+  padding: 20px;
+}
+
+.chart-title {
+  font-weight: 700;
+  color: #FF4D1C;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 220px;
+}
+
+/* Chart Styles */
+.tooltip-style {
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 8px;
+  color: #111827;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.tick-color {
+  fill: #9CA3AF;
+}
+
+.grid-color {
+  stroke: rgba(0,0,0,0.05);
+}
+
+/* Theme Support */
+.light-theme .dashboard-container {
+  background-color: #fff;
+}
+
+.dark-theme .dashboard-container {
+  background-color: #1a1a1a;
+}
+
+.light-theme .dashboard-title {
+  color: #111827;
+}
+
+.dark-theme .dashboard-title {
+  color: #e5e7eb;
+}
+
+.light-theme .dashboard-subtitle {
+  color: #6B7280;
+}
+
+.dark-theme .dashboard-subtitle {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-stage {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-stage {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-timestamp {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-timestamp {
+  color: #9ca3af;
+}

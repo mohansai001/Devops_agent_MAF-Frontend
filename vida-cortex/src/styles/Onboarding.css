@@ -1,0 +1,208 @@
+/* Onboarding Page Styles */
+.onboarding-container {
+  /* Main container */
+}
+
+.onboarding-header {
+  margin-bottom: 24px;
+}
+
+.onboarding-title {
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.02em;
+}
+
+.onboarding-title-accent {
+  color: #FF4D1C;
+}
+
+.onboarding-subtitle {
+  color: #6B7280;
+  margin-top: 4px;
+}
+
+/* Actions */
+.onboarding-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.register-all-button {
+  /* Register all button styles */
+}
+
+/* Table Styles */
+.onboarding-table-container {
+  /* Table container */
+}
+
+.onboarding-table {
+  /* Table styles */
+}
+
+.table-cell-repo {
+  font-weight: 600;
+}
+
+.stat-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.star-icon {
+  font-size: 13px;
+  color: #D97706;
+}
+
+.fork-icon {
+  font-size: 13px;
+}
+
+.visibility-icon {
+  font-size: 13px;
+}
+
+.bug-icon {
+  font-size: 13px;
+}
+
+.bug-icon.has-issues {
+  color: #DC2626;
+}
+
+.issues-text {
+  font-size: 12px;
+}
+
+.issues-text.has-issues {
+  color: #DC2626;
+}
+
+.table-cell-updated {
+  font-size: 12px;
+}
+
+.register-button {
+  /* Register button styles */
+}
+
+.register-button-icon {
+  font-size: 14px !important;
+}
+
+/* Dialog Styles */
+.register-dialog-title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog-agent-icon {
+  color: #FF4D1C;
+  font-size: 20px;
+}
+
+.dialog-description {
+  margin-bottom: 16px;
+}
+
+.webhook-field {
+  /* Webhook field styles */
+}
+
+.dialog-actions {
+  padding: 0 24px 16px 24px;
+}
+
+.cancel-button {
+  color: inherit;
+}
+
+.activate-button {
+  /* Activate button styles */
+}
+
+/* Snackbar Styles */
+.success-snackbar {
+  background-color: rgba(255,77,28,0.06);
+  color: #FF4D1C;
+  border: 1px solid rgba(255,77,28,0.2);
+  border-radius: 8px;
+}
+
+.success-snackbar .MuiAlert-icon {
+  color: #FF4D1C;
+}
+
+.snackbar-icon {
+  font-size: 16px;
+}
+
+/* Theme Support */
+.light-theme .onboarding-container {
+  background-color: #fff;
+}
+
+.dark-theme .onboarding-container {
+  background-color: #1a1a1a;
+}
+
+.light-theme .onboarding-title {
+  color: #111827;
+}
+
+.dark-theme .onboarding-title {
+  color: #e5e7eb;
+}
+
+.light-theme .onboarding-subtitle {
+  color: #6B7280;
+}
+
+.dark-theme .onboarding-subtitle {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-repo {
+  color: #111;
+}
+
+.dark-theme .table-cell-repo {
+  color: #e5e7eb;
+}
+
+.light-theme .stat-container {
+  color: #6b7280;
+}
+
+.dark-theme .stat-container {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-updated {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-updated {
+  color: #9ca3af;
+}
+
+.light-theme .register-dialog-title {
+  color: #111;
+}
+
+.dark-theme .register-dialog-title {
+  color: #e5e7eb;
+}
+
+.light-theme .dialog-description {
+  color: #6b7280;
+}
+
+.dark-theme .dialog-description {
+  color: #9ca3af;
+}

@@ -11,6 +11,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import { failedPipelines } from '../data/mockData';
+import '../styles/FailedPipelines.css';
 
 const ACCENT = '#FF4D1C';
 

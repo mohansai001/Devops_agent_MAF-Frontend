@@ -18,6 +18,7 @@ import KpiCard from '../components/KpiCard';
 import StatusChip from '../components/StatusChip';
 import { pipelines } from '../data/mockData';
 import { neuShadowSm } from '../data/theme';
+import '../styles/Dashboard.css';
 
 const ACCENT = '#FF4D1C';
 
@@ -60,36 +61,38 @@ const codeTagSx = {
 export default function Dashboard() {
   const [tab, setTab] = useState(0);
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const containerClass = `dashboard-container ${isDark ? 'dark-theme' : 'light-theme'}`;
 
   return (
-    <Box>
+    <div className={containerClass}>
       {/* Page heading */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={800} color="#111827" letterSpacing="-0.02em">
-          Pipeline <Box component="span" sx={{ color: ACCENT }}>Overview</Box>
+      <div className="dashboard-header">
+        <Typography variant="h4" className={`dashboard-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
+          Pipeline <span className="dashboard-title-accent">Overview</span>
         </Typography>
-        <Typography variant="body2" color="#6B7280" mt={0.5}>
+        <Typography variant="body2" className={`dashboard-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
           Real-time status of all autonomous CI/CD pipelines
         </Typography>
-      </Box>
+      </div>
 
       {/* KPI row */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap' }}>
+      <div className="kpi-row">
         {kpis.map((k) => <KpiCard key={k.title} {...k} />)}
-      </Box>
+      </div>
 
       {/* Main card */}
       <Card>
-        <Box sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ px: 2 }}>
+        <div className="main-card-tabs" style={{ borderBottomColor: theme.palette.divider }}>
+          <Tabs value={tab} onChange={(_, v) => setTab(v)}>
             <Tab label="Pipelines" />
             <Tab label="Reports" />
           </Tabs>
-        </Box>
+        </div>
 
-        <CardContent sx={{ p: 0 }}>
+        <CardContent className="main-card-content">
           {tab === 0 && (
-            <TableContainer>
+            <TableContainer className="pipelines-table">
               <Table size="small">
                 <TableHead>
                   <TableRow>
@@ -101,21 +104,21 @@ export default function Dashboard() {
                 <TableBody>
                   {pipelines.map((p) => (
                     <TableRow key={p.id}>
-                      <TableCell sx={{ fontWeight: 600 }}>{p.repo}</TableCell>
+                      <TableCell className={`table-cell-repo ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.repo}</TableCell>
                       <TableCell>
-                        <Box component="code" sx={codeTagSx}>{p.branch}</Box>
+                        <code className="branch-code">{p.branch}</code>
                       </TableCell>
                       <TableCell>{p.techStack}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary, fontSize: 12 }}>{p.stage}</TableCell>
+                      <TableCell className={`table-cell-stage ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.stage}</TableCell>
                       <TableCell><StatusChip status={p.status} /></TableCell>
                       <TableCell>{p.appName}</TableCell>
                       <TableCell>{p.deployTarget}</TableCell>
                       <TableCell>
                         {p.deployedUrl !== '-'
-                          ? <Link href={p.deployedUrl} target="_blank" sx={{ fontSize: 12, color: ACCENT }}>{p.deployedUrl}</Link>
-                          : <Typography variant="caption" color="text.secondary">—</Typography>}
+                          ? <Link href={p.deployedUrl} target="_blank" className="table-cell-url">{p.deployedUrl}</Link>
+                          : <Typography variant="caption" className={`table-cell-empty ${isDark ? 'dark-theme' : 'light-theme'}`}>—</Typography>}
                       </TableCell>
-                      <TableCell sx={{ fontSize: 11, color: theme.palette.text.secondary }}>{p.timestamp}</TableCell>
+                      <TableCell className={`table-cell-timestamp ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.timestamp}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -124,7 +127,7 @@ export default function Dashboard() {
           )}
 
           {tab === 1 && (
-            <Box sx={{ p: 3, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 3 }}>
+            <div className="reports-grid">
               {[
                 { title: 'Pipeline Status Distribution', chart: (
                   <PieChart>
@@ -162,17 +165,17 @@ export default function Dashboard() {
                   </PieChart>
                 )},
               ].map(({ title, chart }) => (
-                <Paper key={title} sx={{ p: 2.5, boxShadow: neuShadowSm }}>
-                  <Typography variant="caption" fontWeight={700} sx={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 2 }}>
+                <Paper key={title} className="chart-paper" style={{ boxShadow: neuShadowSm }}>
+                  <Typography variant="caption" className="chart-title">
                     {title}
                   </Typography>
-                  <ResponsiveContainer width="100%" height={220}>{chart}</ResponsiveContainer>
+                  <ResponsiveContainer className="chart-container">{chart}</ResponsiveContainer>
                 </Paper>
               ))}
-            </Box>
+            </div>
           )}
         </CardContent>
       </Card>
-    </Box>
+    </div>
   );
 }

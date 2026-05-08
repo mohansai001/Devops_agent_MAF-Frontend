@@ -1,16 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Box, Card, CardContent, Typography, Button, Chip, useTheme, IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import BuildIcon from '@mui/icons-material/Build';
 import StorageIcon from '@mui/icons-material/Storage';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import GitHubIcon from '@mui/icons-material/GitHub';
+
+import { saveWorkflow } from '../data/workflowStore';
+import '../styles/AgentBuilder.css';
 
 const ACCENT = '#FF4D1C';
 
@@ -140,51 +144,47 @@ function AgentCard({ agent, onClick, showAdd = false }: { agent: Agent; onClick?
   const isDark = theme.palette.mode === 'dark';
   const Icon = agent.icon;
 
+  const cardClasses = `agent-card ${
+    isDark ? 'dark-agent-card' : 'light-agent-card'
+  }`;
+
+  const iconContainerStyle = {
+    backgroundColor: `${agent.color}18`
+  };
+
+  const addIconStyle = {
+    backgroundColor: `${agent.color}20`,
+    color: agent.color
+  };
+
   return (
     <Card 
       onClick={onClick}
-      sx={{
-        minHeight: 80,
-        bgcolor: isDark ? '#2a2a2a' : '#fff',
-        border: `2px solid ${isDark ? '#374151' : 'rgba(0,0,0,0.1)'}`,
-        borderRadius: 2,
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'all 0.2s',
-        boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
-        '&:hover': onClick ? {
-          transform: 'translateY(-2px)',
-          boxShadow: `0 4px 16px ${agent.color}30`,
-          borderColor: agent.color,
-        } : {}
+      className={cardClasses}
+      style={{
+        borderColor: isDark ? '#374151' : 'rgba(0,0,0,0.1)',
+        boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)'
       }}
     >
-      <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box sx={{
-            width: 32, height: 32, borderRadius: '50%',
-            bgcolor: `${agent.color}18`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <Icon sx={{ fontSize: 16, color: agent.color }} />
-          </Box>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography sx={{ fontSize: 12, fontWeight: 700, color: isDark ? '#e5e7eb' : '#111', lineHeight: 1.2 }}>
+      <CardContent className="agent-card-content">
+        <div className="agent-card-inner">
+          <div className="agent-card-icon-container" style={iconContainerStyle}>
+            <Icon className="agent-card-icon" style={{ color: agent.color }} />
+          </div>
+          <div className="agent-card-text">
+            <Typography className="agent-card-title" style={{ color: isDark ? '#e5e7eb' : '#111' }}>
               {agent.label}
             </Typography>
-            <Typography sx={{ fontSize: 10, color: isDark ? '#9ca3af' : '#6b7280', lineHeight: 1.3, mt: 0.2 }}>
+            <Typography className="agent-card-description" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
               {agent.task.substring(0, 40)}...
             </Typography>
-          </Box>
+          </div>
           {showAdd && (
-            <Box sx={{
-              width: 24, height: 24, borderRadius: '50%',
-              bgcolor: `${agent.color}20`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-              <AddIcon sx={{ fontSize: 14, color: agent.color }} />
-            </Box>
+            <div className="add-icon-container" style={addIconStyle}>
+              <AddIcon className="add-icon" />
+            </div>
           )}
-        </Box>
+        </div>
       </CardContent>
     </Card>
   );
@@ -196,145 +196,102 @@ const WINDOW_SIZE = 5;
 function AgentsFlow({ selectedAgents }: { selectedAgents: Agent[] }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const [currentIdx, setCurrentIdx] = useState<number | null>(null);
-  const [doneIds, setDoneIds] = useState<Set<string>>(new Set());
-  const [isRunning, setIsRunning] = useState(false);
-  const [allDone, setAllDone] = useState(false);
   const [windowStart, setWindowStart] = useState(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  const clearTimers = () => { timerRef.current.forEach(clearTimeout); timerRef.current = []; };
-  const schedule = (fn: () => void, delay: number) => { const t = setTimeout(fn, delay); timerRef.current.push(t); };
-
-  const run = () => {
-    if (selectedAgents.length === 0) return;
-    clearTimers();
-    setIsRunning(true);
-    setAllDone(false);
-    setDoneIds(new Set());
-    setCurrentIdx(null);
-    setWindowStart(0);
-
-    selectedAgents.forEach((agent, i) => {
-      const start = i * 2000;
-      schedule(() => {
-        setCurrentIdx(i);
-        // auto-slide window when active agent goes beyond visible range
-        setWindowStart(w => {
-          const end = w + WINDOW_SIZE - 1;
-          if (i > end) return i - WINDOW_SIZE + 1;
-          return w;
-        });
-      }, start);
-      schedule(() => {
-        setDoneIds(prev => new Set([...prev, agent.id]));
-        if (i === selectedAgents.length - 1) { setCurrentIdx(null); setIsRunning(false); setAllDone(true); }
-      }, start + 1800);
-    });
-  };
-
-  useEffect(() => () => clearTimers(), []);
 
   const total = selectedAgents.length;
   const visibleAgents = selectedAgents.slice(windowStart, windowStart + WINDOW_SIZE);
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Typography sx={{ fontSize: 14, fontWeight: 700, color: isDark ? '#e5e7eb' : '#111' }}>Agents Flow</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <div>
+      <div className="agents-flow-header">
+        <Typography className="agents-flow-title" style={{ color: isDark ? '#e5e7eb' : '#111' }}>
+          Agents Flow
+        </Typography>
+        <div className="flow-navigation">
           {total > WINDOW_SIZE && (
             <>
-              <Button size="small" variant="outlined" disabled={windowStart === 0}
+              <Button 
+                size="small" 
+                variant="outlined" 
+                disabled={windowStart === 0}
                 onClick={() => setWindowStart(w => Math.max(0, w - 1))}
-                sx={{ minWidth: 0, px: 1.2, py: 0.4, borderRadius: 999, fontWeight: 700, boxShadow: 'none' }}>◀</Button>
-              <Typography sx={{ fontSize: 11, fontWeight: 600, color: isDark ? '#9ca3af' : '#6b7280', minWidth: 70, textAlign: 'center' }}>
+                className="nav-button"
+              >
+                ◀
+              </Button>
+              <Typography className="nav-counter" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
                 {windowStart + 1}–{Math.min(windowStart + WINDOW_SIZE, total)} of {total}
               </Typography>
-              <Button size="small" variant="outlined" disabled={windowStart + WINDOW_SIZE >= total}
+              <Button 
+                size="small" 
+                variant="outlined" 
+                disabled={windowStart + WINDOW_SIZE >= total}
                 onClick={() => setWindowStart(w => Math.min(total - WINDOW_SIZE, w + 1))}
-                sx={{ minWidth: 0, px: 1.2, py: 0.4, borderRadius: 999, fontWeight: 700, boxShadow: 'none' }}>▶</Button>
+                className="nav-button"
+              >
+                ▶
+              </Button>
             </>
           )}
-          <Button variant="contained" startIcon={<PlayArrowIcon />} onClick={run} disabled={isRunning}
-            sx={{ borderRadius: 999, fontWeight: 700, boxShadow: 'none' }}>
-            {isRunning ? 'Running...' : allDone ? 'Re-run' : 'Run'}
-          </Button>
-        </Box>
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        </div>
+      </div>
+      <div className="agents-container">
         {visibleAgents.map((agent, i) => {
           const globalIdx = windowStart + i;
           const Icon = agent.icon;
-          const isActive = currentIdx === globalIdx;
-          const isDone = doneIds.has(agent.id);
-          const isPast = currentIdx !== null && globalIdx < currentIdx;
-          const connectorColor = isDone || isPast ? '#059669' : (isDark ? '#4B5563' : '#D1D5DB');
-          const borderColor = isDone ? '#059669' : isActive ? agent.color : (isDark ? '#374151' : 'rgba(0,0,0,0.1)');
-          const bgColor = isDone ? 'rgba(5,150,105,0.08)' : isActive ? `${agent.color}18` : (isDark ? '#2a2a2a' : '#fafafa');
-          const labelColor = isDone ? '#059669' : isActive ? agent.color : (isDark ? '#9ca3af' : '#9CA3AF');
+          const connectorColor = isDark ? '#4B5563' : '#D1D5DB';
+          const borderColor = isDark ? '#374151' : 'rgba(0,0,0,0.1)';
+          const bgColor = isDark ? '#2a2a2a' : '#fafafa';
+          const labelColor = isDark ? '#9ca3af' : '#9CA3AF';
+          
           return (
-            <Box key={agent.id} sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            <div key={agent.id} className="agent-flow-item">
               {i > 0 && (
-                <Box sx={{ display: 'flex', alignItems: 'center', mx: 0.5, flexShrink: 0 }}>
-                  <Box sx={{ width: 20, height: 2, bgcolor: connectorColor, transition: 'background 0.3s' }} />
-                  <Box sx={{ width: 0, height: 0, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderLeft: `6px solid ${connectorColor}`, transition: 'border-left-color 0.3s' }} />
-                </Box>
+                <div className="agent-connector">
+                  <div className="connector-line" style={{ backgroundColor: connectorColor }} />
+                  <div className="connector-arrow" style={{ borderLeftColor: `6px solid ${connectorColor}` }} />
+                </div>
               )}
-              <Box sx={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5,
-                px: 1, py: 1, borderRadius: 2,
-                border: `2px solid ${borderColor}`,
-                bgcolor: bgColor,
-                transition: 'all 0.3s ease',
-                transform: isActive ? 'translateY(-4px)' : 'none',
-                boxShadow: isActive ? `0 6px 20px ${agent.color}40` : 'none',
-                position: 'relative', overflow: 'hidden',
-              }}>
-                {isActive && (
-                  <Box sx={{
-                    position: 'absolute', inset: 0,
-                    background: `linear-gradient(90deg, transparent, ${agent.color}25, transparent)`,
-                    animation: 'shimmer 1.2s ease-in-out infinite',
-                    '@keyframes shimmer': { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
-                  }} />
-                )}
-                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: `${agent.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                  <Icon sx={{ fontSize: 14, color: isDone ? '#059669' : isActive ? agent.color : '#9CA3AF' }} />
-                  {isActive && (
-                    <Box sx={{ position: 'absolute', inset: -3, borderRadius: '50%', border: `1.5px solid ${agent.color}`, animation: 'ringPulse 1s ease-in-out infinite', '@keyframes ringPulse': { '0%,100%': { opacity: 0.9, transform: 'scale(1)' }, '50%': { opacity: 0.2, transform: 'scale(1.2)' } } }} />
-                  )}
-                </Box>
-                <Typography sx={{ fontSize: 9, fontWeight: 700, color: labelColor, textAlign: 'center', lineHeight: 1.2 }}>
+              <div 
+                className="agent-flow-box"
+                style={{
+                  borderColor: borderColor,
+                  backgroundColor: bgColor
+                }}
+              >
+                <div className="agent-icon-container" style={{ backgroundColor: `${agent.color}20` }}>
+                  <Icon className="agent-icon" style={{ color: agent.color }} />
+                </div>
+                <Typography className="agent-flow-label" style={{ color: agent.color }}>
                   {agent.label}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-                  {isDone && <CheckCircleIcon sx={{ fontSize: 10, color: '#059669' }} />}
-                  {isActive && <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: agent.color, animation: 'dot 0.8s ease-in-out infinite', '@keyframes dot': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.2 } } }} />}
-                  <Typography sx={{ fontSize: 8, fontWeight: 700, color: isDone ? '#059669' : isActive ? agent.color : (isDark ? '#6B7280' : '#D1D5DB') }}>
-                    {isDone ? 'Done' : isActive ? 'Running' : `Step ${globalIdx + 1}`}
+                <div>
+                  <Typography className="agent-step-label" style={{ color: labelColor }}>
+                    Step {globalIdx + 1}
                   </Typography>
-                </Box>
-              </Box>
-            </Box>
+                </div>
+              </div>
+            </div>
           );
         })}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 
 // Main Agent Builder Component
 export default function AgentBuilder() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const repoName = searchParams.get('repo') || 'Select Repository';
   
   const [availableAgents, setAvailableAgents] = useState<Agent[]>(ALL_AGENTS);
   const [selectedAgents, setSelectedAgents] = useState<Agent[]>([]);
-
   const [promptDialog, setPromptDialog] = useState<{ open: boolean; agent: Agent | null }>({ open: false, agent: null });
+  const [saveDialog, setSaveDialog] = useState(false);
+  const [workflowName, setWorkflowName] = useState('');
 
   const colors = {
     bg: isDark ? '#0f0f0f' : '#f8fafc',
@@ -383,6 +340,24 @@ export default function AgentBuilder() {
     setSelectedAgents([]);
   };
 
+  const handleSaveWorkflow = () => {
+    if (!workflowName.trim()) return;
+    saveWorkflow({
+      name: workflowName,
+      agents: selectedAgents.map(a => ({
+        id: a.id,
+        label: a.label,
+        color: a.color,
+        task: a.task,
+        prompt: a.prompt,
+        success: a.success,
+      })),
+    });
+    setSaveDialog(false);
+    setWorkflowName('');
+    navigate('/workflows');
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: colors.bg, p: 2, pt: 1 }}>
       <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
@@ -392,6 +367,16 @@ export default function AgentBuilder() {
             label={repoName}
             sx={{ bgcolor: `${ACCENT}20`, color: ACCENT, fontWeight: 700, '& .MuiChip-label': { px: 1.5 } }}
           />
+          {selectedAgents.length > 0 && (
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={() => setSaveDialog(true)}
+              sx={{ borderRadius: 999, boxShadow: 'none' }}
+            >
+              Save Workflow
+            </Button>
+          )}
           <Button variant="outlined" size="small" onClick={clearPipeline} sx={{ borderRadius: 999 }}>
             Clear All
           </Button>
@@ -539,12 +524,36 @@ export default function AgentBuilder() {
         </Box>
 
         {/* Prompt Dialog */}
-        <PromptDialog 
+        <PromptDialog
           open={promptDialog.open}
           onClose={closePromptDialog}
           agent={promptDialog.agent}
           onSave={saveAgentPrompt}
         />
+
+        {/* Save Workflow Dialog */}
+        <Dialog open={saveDialog} onClose={() => setSaveDialog(false)} maxWidth="xs" fullWidth>
+          <DialogTitle sx={{ color: isDark ? '#e5e7eb' : '#111' }}>Save Workflow</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              autoFocus
+              label="Workflow Name"
+              placeholder="e.g. My CI/CD Pipeline"
+              value={workflowName}
+              onChange={(e) => setWorkflowName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveWorkflow()}
+              sx={{ mt: 1 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setSaveDialog(false)} sx={{ color: isDark ? '#9ca3af' : '#6b7280' }}>Cancel</Button>
+            <Button onClick={handleSaveWorkflow} variant="contained" disabled={!workflowName.trim()}
+              startIcon={<SaveIcon />}>
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );

@@ -13,6 +13,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import BuildIcon from '@mui/icons-material/Build';
 import ErrorIcon from '@mui/icons-material/Error';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { neuShadowSm } from '../data/theme';
 import { useThemeMode } from '../hooks/useThemeMode';
@@ -21,6 +22,7 @@ const navItems = [
   { label: 'Dashboard',        icon: DashboardIcon,        path: '/dashboard' },
   { label: 'Approvals',        icon: CheckCircleIcon,      path: '/approvals' },
   { label: 'Agent Builder',    icon: SettingsIcon,         path: '/agent-builder' },
+  { label: 'Workflows',        icon: AccountTreeIcon,      path: '/workflows' },
   { label: 'Repositories',     icon: FolderIcon,           path: '/repos' },
   { label: 'Onboarding',       icon: AddCircleOutlineIcon, path: '/onboarding' },
   { label: 'Deployments',      icon: RocketLaunchIcon,     path: '/deployments' },
