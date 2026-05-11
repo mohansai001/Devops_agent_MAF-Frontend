@@ -1,4 +1,4 @@
-import { Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import StatusChip from '../components/StatusChip';
 import { builds } from '../data/mockData';
@@ -6,8 +6,6 @@ import '../styles/Builds.css';
 
 const ACCENT = '#FF4D1C';
 
-const branchCodeSx  = { bgcolor: 'rgba(255,77,28,0.07)', color: ACCENT, px: 0.8, py: 0.3, borderRadius: 1, fontSize: 11 };
-const workflowCodeSx = { bgcolor: 'rgba(0,0,0,0.05)', color: '#6B7280', px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
 
 export default function Builds() {
   const theme = useTheme();

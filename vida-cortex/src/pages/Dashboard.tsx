@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Box, Card, CardContent, Typography, Tab, Tabs,
+  Card, CardContent, Typography, Tab, Tabs,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Link, Paper,
 } from '@mui/material';
@@ -17,7 +17,6 @@ import {
 import KpiCard from '../components/KpiCard';
 import StatusChip from '../components/StatusChip';
 import { pipelines } from '../data/mockData';
-import { neuShadowSm } from '../data/theme';
 import '../styles/Dashboard.css';
 
 const ACCENT = '#0D9488';
@@ -40,26 +39,10 @@ const techData   = [{ name: 'Node.js', count: 3 }, { name: 'Python', count: 2 },
 const targetData = [{ name: 'AWS EKS', count: 4 }, { name: 'Azure AKS', count: 2 }, { name: 'GCP GKE', count: 2 }];
 const successData = [{ name: 'Success', value: 4 }, { name: 'Failure', value: 1 }];
 
-const tooltipStyle = {
-  backgroundColor: '#fff',
-  border: '1px solid rgba(0,0,0,0.08)',
-  borderRadius: '8px',
-  color: '#111827',
-  boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-  padding: '8px 12px',
-  fontSize: '12px'
-};
 
 const tickColor = '#9CA3AF';
 const gridColor = 'rgba(0,0,0,0.05)';
 
-const codeTagSx = {
-  bgcolor: 'rgba(13,148,136,0.07)',
-  color: ACCENT,
-  px: 0.8, py: 0.3,
-  borderRadius: 1,
-  fontSize: 11,
-};
 
 export default function Dashboard() {
   const [tab, setTab] = useState(0);

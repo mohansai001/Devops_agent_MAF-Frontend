@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  Box, Card, Typography, Button, Table, TableBody, TableCell,
+  Card, Typography, Button, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Dialog, DialogTitle,
   DialogContent, DialogActions, TextField, Snackbar, Alert,
 } from '@mui/material';
@@ -13,7 +13,6 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import { repositories } from '../data/mockData';
 import '../styles/Onboarding.css';
 
-const ACCENT = '#FF4D1C';
 
 export default function Onboarding() {
   const [open, setOpen] = useState(false);

@@ -1,10 +1,9 @@
-import { Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link, Typography } from '@mui/material';
+import { Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import StatusChip from '../components/StatusChip';
 import { deployments } from '../data/mockData';
 import '../styles/Deployments.css';
 
-const ACCENT = '#FF4D1C';
 
 const envStyle: Record<string, { bg: string; color: string }> = {
   Production:  { bg: 'rgba(245,158,11,0.1)',  color: '#D97706' },
@@ -12,7 +11,6 @@ const envStyle: Record<string, { bg: string; color: string }> = {
   Development: { bg: 'rgba(107,114,128,0.08)', color: '#6B7280' },
 };
 
-const regionCodeSx = { bgcolor: 'rgba(0,0,0,0.05)', color: '#6B7280', px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
 
 export default function Deployments() {
   const theme = useTheme();
@@ -42,7 +40,6 @@ export default function Deployments() {
             </TableHead>
             <TableBody>
               {deployments.map((d) => {
-                const env = envStyle[d.environment] ?? envStyle.Development;
                 return (
                   <TableRow key={d.id}>
                     <TableCell className={`table-cell-app ${isDark ? 'dark-theme' : 'light-theme'}`}>{d.appName}</TableCell>

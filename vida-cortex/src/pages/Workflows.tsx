@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, IconButton, Chip, useTheme, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem } from '@mui/material';
+import { Card, CardContent, Typography, IconButton, Chip, useTheme, Button, Dialog, DialogContent, DialogActions, TextField, MenuItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useNavigate } from 'react-router-dom';
 import { getWorkflows, deleteWorkflow, startWorkflowExecution, createDemoWorkflow, Workflow } from '../data/workflowStore';
 import '../styles/Workflows.css';
 
-const ACCENT = '#059669';
 
 export default function Workflows() {
   const theme = useTheme();

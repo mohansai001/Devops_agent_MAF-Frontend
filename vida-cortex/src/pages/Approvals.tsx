@@ -48,17 +48,6 @@ const AGENT_SUCCESS = [
   'Monitoring active ✓', 'Rollback complete ✓', 'Approved ✓', 'Audit passed ✓', 'Pipeline finalized ✓',
 ];
 
-// Create up to 20 agents dynamically
-const AGENTS = Array.from({ length: 20 }, (_, i) => ({
-  key: AGENT_LABELS[i],
-  icon: AGENT_ICONS[i % AGENT_ICONS.length],
-  color: AGENT_COLORS[i % AGENT_COLORS.length],
-  label: AGENT_LABELS[i],
-  shortName: AGENT_SHORT_NAMES[i],
-  task: AGENT_TASKS[i],
-  success: AGENT_SUCCESS[i],
-}));
-
 // Simulation phases per agent
 // 'idle' → 'delegating' → 'working' → 'returning' → 'done'
 type AgentPhase = 'idle' | 'delegating' | 'working' | 'returning' | 'done' | 'failed';
@@ -75,65 +64,6 @@ const getInitialStates = (count: number): AgentState[] => Array.from({ length: c
 const T_DELEGATE = 900;   // arrow animates down
 const T_WORK     = 1800;  // agent works
 const T_RETURN   = 800;   // return arrow animates up
-
-// ── Animated arrow between orchestrator and agent ────────────
-function Arrow({ phase, color }: { phase: AgentPhase; color: string }) {
-  const down    = phase === 'delegating' || phase === 'working' || phase === 'returning' || phase === 'done';
-  const up      = phase === 'returning' || phase === 'done';
-  const animate = phase === 'delegating';
-  const animUp  = phase === 'returning';
-
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: 52, position: 'relative' }}>
-      {/* Down line */}
-      <Box sx={{
-        width: 2, flex: 1,
-        bgcolor: down ? color : 'rgba(0,0,0,0.08)',
-        borderRadius: 1, position: 'relative', overflow: 'hidden',
-        transition: 'background-color 0.3s',
-      }}>
-        {animate && (
-          <Box sx={{
-            position: 'absolute', left: 0, right: 0, height: '40%',
-            background: `linear-gradient(180deg, transparent, ${color})`,
-            animation: 'arrowDown 0.6s linear infinite',
-            '@keyframes arrowDown': { '0%': { top: '-40%' }, '100%': { top: '100%' } },
-          }} />
-        )}
-      </Box>
-      {/* Arrowhead down */}
-      <Box sx={{
-        width: 0, height: 0,
-        borderLeft: '4px solid transparent', borderRight: '4px solid transparent',
-        borderTop: `6px solid ${down ? color : 'rgba(0,0,0,0.08)'}`,
-        transition: 'border-top-color 0.3s',
-      }} />
-
-      {/* Return line (up) */}
-      {up && (
-        <>
-          <Box sx={{ width: 0, height: 0, mt: 0.5,
-            borderLeft: '4px solid transparent', borderRight: '4px solid transparent',
-            borderBottom: `6px solid ${color}`,
-          }} />
-          <Box sx={{
-            width: 2, flex: 1, bgcolor: color, borderRadius: 1,
-            position: 'relative', overflow: 'hidden', opacity: 0.6,
-          }}>
-            {animUp && (
-              <Box sx={{
-                position: 'absolute', left: 0, right: 0, height: '40%',
-                background: `linear-gradient(0deg, transparent, ${color})`,
-                animation: 'arrowUp 0.6s linear infinite',
-                '@keyframes arrowUp': { '0%': { bottom: '-40%' }, '100%': { bottom: '100%' } },
-              }} />
-            )}
-          </Box>
-        </>
-      )}
-    </Box>
-  );
-}
 
 
 

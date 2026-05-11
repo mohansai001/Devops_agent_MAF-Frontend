@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, CardContent, Typography, Button, Divider } from '@mui/material';
+import { Card, CardContent, Typography, Button, Divider } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import '../styles/Login.css';

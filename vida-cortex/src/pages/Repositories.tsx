@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, CardContent, Typography, TextField, InputAdornment, Chip } from '@mui/material';
+import { Card, CardContent, Typography, TextField, InputAdornment, Chip } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import StarIcon from '@mui/icons-material/Star';
 import ForkRightIcon from '@mui/icons-material/ForkRight';
@@ -10,9 +10,7 @@ import { repositories, langColors } from '../data/mockData';
 import { neuShadow } from '../data/theme';
 import '../styles/Repositories.css';
 
-const ACCENT = '#FF4D1C';
 
-const branchCodeSx = { bgcolor: 'rgba(255,77,28,0.06)', color: ACCENT, border: 'none', px: 0.7, py: 0.2, borderRadius: 1, fontSize: 10 };
 
 export default function Repositories() {
   const [search, setSearch] = useState('');
