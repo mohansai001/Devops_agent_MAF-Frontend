@@ -61,7 +61,11 @@ jobs:
 
       # Gitleaks
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        run: |
+         docker run --rm -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect \
+          --source="/path" \
+          --verbose \
+          --redact
 
       # Trivy
       - name: Run Trivy FS Scan
