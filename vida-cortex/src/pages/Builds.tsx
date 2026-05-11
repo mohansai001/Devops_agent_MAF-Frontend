@@ -4,7 +4,6 @@ import StatusChip from '../components/StatusChip';
 import { builds } from '../data/mockData';
 import '../styles/Builds.css';
 
-const ACCENT = '#FF4D1C';
 
 
 export default function Builds() {

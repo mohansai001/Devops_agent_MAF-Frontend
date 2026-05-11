@@ -20,33 +20,6 @@ const ACCENT = '#059669';
 
 // ── Agent definitions (dynamic, up to 20) ────────────────────
 const AGENT_ICONS = [SearchIcon, BuildIcon, StorageIcon, RocketLaunchIcon, GitHubIcon];
-const AGENT_COLORS = ['#7C3AED', '#2563EB', '#D97706', '#059669', '#374151'];
-const AGENT_LABELS = [
-  'Tech Detection', 'CI Pipeline', 'Terraform', 'CD Pipeline', 'GitHub Actions',
-  'Security Scan', 'Docker Build', 'Helm Chart', 'Unit Tests', 'Integration Tests',
-  'Lint', 'Code Coverage', 'Release', 'Notification', 'Cleanup',
-  'Monitoring', 'Rollback', 'Approval', 'Infra Audit', 'Finalizer',
-];
-const AGENT_SHORT_NAMES = [
-  'Tech', 'CI', 'Terraform', 'CD', 'GitHub',
-  'Security', 'Docker', 'Helm', 'Tests', 'Integration',
-  'Lint', 'Coverage', 'Release', 'Notify', 'Cleanup',
-  'Monitor', 'Rollback', 'Approve', 'Audit', 'Final',
-];
-const AGENT_TASKS = [
-  'Scanning repo & detecting runtime...', 'Running build, lint & unit tests...', 'Provisioning cloud infrastructure...',
-  'Deploying to Kubernetes cluster...', 'Running post-deploy smoke tests...',
-  'Security scanning...', 'Building Docker image...', 'Packaging Helm chart...', 'Running unit tests...', 'Running integration tests...',
-  'Linting code...', 'Calculating coverage...', 'Creating release...', 'Sending notifications...', 'Cleaning up...',
-  'Monitoring deployment...', 'Rolling back...', 'Awaiting approval...', 'Auditing infra...', 'Finalizing pipeline...'
-];
-const AGENT_SUCCESS = [
-  'Stack detected ✓ Node.js v18', 'Build passed · 42/42 tests ✓', 'Infra provisioned ✓ EKS ready',
-  'Deployed · 3/3 pods running ✓', 'All checks passed ✓ Live!',
-  'No vulnerabilities found ✓', 'Image built ✓', 'Chart packaged ✓', 'All unit tests passed ✓', 'Integration tests passed ✓',
-  'No lint errors ✓', 'Coverage 98% ✓', 'Release created ✓', 'Notifications sent ✓', 'Cleanup done ✓',
-  'Monitoring active ✓', 'Rollback complete ✓', 'Approved ✓', 'Audit passed ✓', 'Pipeline finalized ✓',
-];
 
 // Simulation phases per agent
 // 'idle' → 'delegating' → 'working' → 'returning' → 'done'

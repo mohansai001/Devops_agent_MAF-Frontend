@@ -5,11 +5,6 @@ import { deployments } from '../data/mockData';
 import '../styles/Deployments.css';
 
 
-const envStyle: Record<string, { bg: string; color: string }> = {
-  Production:  { bg: 'rgba(245,158,11,0.1)',  color: '#D97706' },
-  Staging:     { bg: 'rgba(59,130,246,0.1)',  color: '#2563EB' },
-  Development: { bg: 'rgba(107,114,128,0.08)', color: '#6B7280' },
-};
 
 
 export default function Deployments() {

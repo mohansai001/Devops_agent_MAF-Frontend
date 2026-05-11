@@ -7,14 +7,12 @@ import {
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
-import FolderIcon from '@mui/icons-material/Folder';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import BuildIcon from '@mui/icons-material/Build';
-import ErrorIcon from '@mui/icons-material/Error';
+
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
 import { neuShadowSm } from '../data/theme';
 import { useThemeMode } from '../hooks/useThemeMode';
 
