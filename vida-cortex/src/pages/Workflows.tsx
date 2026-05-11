@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { getWorkflows, deleteWorkflow, startWorkflowExecution, createDemoWorkflow, Workflow } from '../data/workflowStore';
 import '../styles/Workflows.css';
 
-const ACCENT = '#FF4D1C';
+const ACCENT = '#059669';
 
 export default function Workflows() {
   const theme = useTheme();
@@ -110,8 +110,8 @@ export default function Workflows() {
                         size="small"
                         className="agent-chip"
                         style={{
-                          backgroundColor: `${agent.color}15`,
-                          color: agent.color,
+                          backgroundColor: 'rgba(5,150,105,0.07)',
+                          color: '#059669',
                         }}
                       />
                     ))}
@@ -125,9 +125,6 @@ export default function Workflows() {
 
       {/* Execute Dialog */}
       <Dialog open={executeDialog.open} onClose={() => setExecuteDialog({ open: false, workflow: null })} maxWidth="sm" fullWidth>
-        <DialogTitle className={`execute-dialog-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
-          Execute Workflow: {executeDialog.workflow?.name}
-        </DialogTitle>
         <DialogContent className="execute-dialog-content">
           <TextField
             select

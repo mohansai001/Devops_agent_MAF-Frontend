@@ -1,6 +1,7 @@
 /* Onboarding Page Styles */
 .onboarding-container {
-  /* Main container */
+  padding: 24px;
+  min-height: 100vh;
 }
 
 .onboarding-header {
@@ -11,6 +12,8 @@
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
 .onboarding-title-accent {
@@ -30,16 +33,21 @@
 }
 
 .register-all-button {
-  /* Register all button styles */
+  background-color: #FF4D1C;
+  color: white;
+}
+
+.register-all-button:hover {
+  background-color: #e63946;
 }
 
 /* Table Styles */
 .onboarding-table-container {
-  /* Table container */
+  width: 100%;
 }
 
 .onboarding-table {
-  /* Table styles */
+  width: 100%;
 }
 
 .table-cell-repo {
@@ -86,7 +94,12 @@
 }
 
 .register-button {
-  /* Register button styles */
+  border: 1px solid rgba(0,0,0,0.2);
+  color: #3B82F6;
+}
+
+.register-button:hover {
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 .register-button-icon {
@@ -99,6 +112,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 24px 24px 16px 24px;
 }
 
 .dialog-agent-icon {
@@ -111,19 +125,24 @@
 }
 
 .webhook-field {
-  /* Webhook field styles */
+  margin-top: 16px;
 }
 
 .dialog-actions {
-  padding: 0 24px 16px 24px;
+  padding: 16px 24px 24px 24px;
 }
 
 .cancel-button {
-  color: inherit;
+  color: #6b7280;
 }
 
 .activate-button {
-  /* Activate button styles */
+  background-color: #FF4D1C;
+  color: white;
+}
+
+.activate-button:hover {
+  background-color: #e63946;
 }
 
 /* Snackbar Styles */
@@ -144,11 +163,11 @@
 
 /* Theme Support */
 .light-theme .onboarding-container {
-  background-color: #fff;
+  background-color: #f8fafc;
 }
 
 .dark-theme .onboarding-container {
-  background-color: #1a1a1a;
+  background-color: #0f0f0f;
 }
 
 .light-theme .onboarding-title {

@@ -1,6 +1,7 @@
 /* Repositories Page Styles */
 .repositories-container {
-  /* Main container */
+  padding: 24px;
+  min-height: 100vh;
 }
 
 .repositories-header {
@@ -11,6 +12,8 @@
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
 .repositories-title-accent {
@@ -42,11 +45,14 @@
 
 .repository-card {
   cursor: pointer;
-  transition: box-shadow 0.2s;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 .repository-card:hover {
-  box-shadow: 10px 10px 24px rgba(0,0,0,0.1), -10px -10px 24px rgba(255,255,255,0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 /* Repository Card Content */
@@ -59,6 +65,7 @@
 
 .repo-name {
   font-weight: 700;
+  font-size: 14px;
 }
 
 .visibility-chip {
@@ -97,7 +104,7 @@
 }
 
 .language-text {
-  /* Language text styles */
+  font-size: 12px;
 }
 
 .branch-code {
@@ -108,6 +115,7 @@
   border-radius: 4px;
   font-size: 10px;
   margin-left: 8px;
+  font-family: monospace;
 }
 
 /* Repository Stats */
@@ -134,7 +142,7 @@
 }
 
 .stat-text {
-  /* Stat text styles */
+  font-size: 12px;
 }
 
 .last-updated {
@@ -144,11 +152,11 @@
 
 /* Theme Support */
 .light-theme .repositories-container {
-  background-color: #fff;
+  background-color: #f8fafc;
 }
 
 .dark-theme .repositories-container {
-  background-color: #1a1a1a;
+  background-color: #0f0f0f;
 }
 
 .light-theme .repositories-title {
@@ -169,12 +177,12 @@
 
 .light-theme .repository-card {
   background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.1);
+  border-color: rgba(0,0,0,0.1);
 }
 
 .dark-theme .repository-card {
-  background-color: #2a2a2a;
-  border: 1px solid #374151;
+  background-color: #1a1a1a;
+  border-color: #374151;
 }
 
 .light-theme .repo-name {

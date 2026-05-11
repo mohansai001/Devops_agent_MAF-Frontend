@@ -1,6 +1,11 @@
 /* Dashboard Styles */
 .dashboard-container {
-  /* Main container styles */
+  padding: 24px;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .dashboard-header {
@@ -11,10 +16,12 @@
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
 .dashboard-title-accent {
-  color: #FF4D1C;
+  color: #059669;
 }
 
 .dashboard-subtitle {
@@ -32,7 +39,7 @@
 
 /* Main Card */
 .main-card-tabs {
-  border-bottom: 1px solid;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
   padding: 0 16px;
 }
 
@@ -42,7 +49,7 @@
 
 /* Table Styles */
 .pipelines-table {
-  /* Table container styles */
+  width: 100%;
 }
 
 .table-cell-repo {
@@ -50,11 +57,12 @@
 }
 
 .branch-code {
-  background-color: rgba(255,77,28,0.07);
+  background-color: rgba(5,150,105,0.07);
   color: #FF4D1C;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
+  font-family: monospace;
 }
 
 .table-cell-stage {
@@ -64,6 +72,11 @@
 .table-cell-url {
   font-size: 12px;
   color: #FF4D1C;
+  text-decoration: none;
+}
+
+.table-cell-url:hover {
+  text-decoration: underline;
 }
 
 .table-cell-timestamp {
@@ -71,7 +84,7 @@
 }
 
 .table-cell-empty {
-  /* Empty cell styles */
+  font-size: 12px;
 }
 
 /* Reports Grid */
@@ -80,10 +93,17 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
+  width: 100%;
 }
 
 .chart-paper {
   padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-title {
@@ -94,37 +114,42 @@
   display: block;
   margin-bottom: 16px;
   font-size: 12px;
+  flex-shrink: 0;
 }
 
 .chart-container {
   width: 100%;
-  height: 220px;
+  height: 200px;
+  flex: 1;
+  min-height: 200px;
 }
 
-/* Chart Styles */
-.tooltip-style {
-  background-color: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 8px;
-  color: #111827;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+/* Dark theme for charts */
+.dark-theme .chart-paper {
+  background-color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-.tick-color {
-  fill: #9CA3AF;
-}
-
-.grid-color {
-  stroke: rgba(0,0,0,0.05);
+/* Fix for chart responsiveness */
+@media (max-width: 768px) {
+  .reports-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  
+  .chart-container {
+    height: 180px;
+    min-height: 180px;
+  }
 }
 
 /* Theme Support */
 .light-theme .dashboard-container {
-  background-color: #fff;
+  background-color: #f8fafc;
 }
 
 .dark-theme .dashboard-container {
-  background-color: #1a1a1a;
+  background-color: #0f0f0f;
 }
 
 .light-theme .dashboard-title {
@@ -143,6 +168,22 @@
   color: #9ca3af;
 }
 
+.light-theme .main-card-tabs {
+  border-bottom-color: rgba(0,0,0,0.1);
+}
+
+.dark-theme .main-card-tabs {
+  border-bottom-color: #374151;
+}
+
+.light-theme .table-cell-repo {
+  color: #111;
+}
+
+.dark-theme .table-cell-repo {
+  color: #e5e7eb;
+}
+
 .light-theme .table-cell-stage {
   color: #6b7280;
 }
@@ -156,5 +197,13 @@
 }
 
 .dark-theme .table-cell-timestamp {
+  color: #9ca3af;
+}
+
+.light-theme .table-cell-empty {
+  color: #6b7280;
+}
+
+.dark-theme .table-cell-empty {
   color: #9ca3af;
 }

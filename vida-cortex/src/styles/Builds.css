@@ -1,6 +1,7 @@
 /* Builds Page Styles */
 .builds-container {
-  /* Main container */
+  padding: 24px;
+  min-height: 100vh;
 }
 
 .builds-header {
@@ -11,6 +12,8 @@
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
 .builds-title-accent {
@@ -24,11 +27,11 @@
 
 /* Table Styles */
 .builds-table-container {
-  /* Table container */
+  width: 100%;
 }
 
 .builds-table {
-  /* Table styles */
+  width: 100%;
 }
 
 .table-header {
@@ -45,6 +48,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
+  font-family: monospace;
 }
 
 .workflow-code {
@@ -53,6 +57,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
+  font-family: monospace;
 }
 
 .table-cell-duration {
@@ -66,11 +71,11 @@
 
 /* Theme Support */
 .light-theme .builds-container {
-  background-color: #fff;
+  background-color: #f8fafc;
 }
 
 .dark-theme .builds-container {
-  background-color: #1a1a1a;
+  background-color: #0f0f0f;
 }
 
 .light-theme .builds-title {

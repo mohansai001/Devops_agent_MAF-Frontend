@@ -32,12 +32,12 @@
   width: 60px;
   height: 60px;
   border-radius: 12px;
-  background-color: #FF4D1C;
+  background-color: #14b8a6;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  box-shadow: 4px 4px 14px rgba(255,77,28,0.35), -2px -2px 8px rgba(255,255,255,0.6);
+  box-shadow: 0 4px 16px 0 rgba(20,184,166,0.25), 0 1.5px 6px 0 rgba(20,184,166,0.12);
 }
 
 .login-logo-icon {
@@ -72,7 +72,19 @@
   width: 100%;
   padding: 12px 0;
   font-size: 0.95rem;
+  background: #14b8a6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px 0 rgba(20,184,166,0.15);
+  transition: background 0.2s;
+  cursor: pointer;
 }
+.login-button:hover, .login-button:focus {
+  background: #0d9488;
+}
+
 
 .login-terms {
   color: #9CA3AF;

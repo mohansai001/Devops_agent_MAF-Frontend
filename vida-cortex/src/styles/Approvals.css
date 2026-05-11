@@ -71,7 +71,7 @@
 /* Branch and SHA codes */
 .branch-code {
   background-color: rgba(255,77,28,0.07);
-  color: #FF4D1C;
+  color: #059669;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
@@ -539,7 +539,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #FF4D1C;
+  background-color: #059669;
   animation: blink 1.2s ease-in-out infinite;
 }
 
@@ -651,7 +651,7 @@
 }
 
 .deployed-url-link {
-  color: #FF4D1C;
+  color: #059669;
   font-size: 12px;
   padding: 0;
   min-width: 0;

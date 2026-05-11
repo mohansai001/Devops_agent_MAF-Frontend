@@ -17,7 +17,8 @@
 
 /* Empty State */
 .workflows-empty-card {
-  border: 1px solid;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
 }
 
 .workflows-empty-text {
@@ -34,7 +35,8 @@
 }
 
 .workflow-card {
-  border: 1px solid;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
 }
 
 .workflow-header {
@@ -45,12 +47,13 @@
 }
 
 .workflow-info {
-  /* Workflow info section */
+  flex: 1;
 }
 
 .workflow-name {
   font-size: 16px;
   font-weight: 700;
+  margin-bottom: 4px;
 }
 
 .workflow-created {
@@ -68,6 +71,8 @@
   color: white;
   font-size: 0.75rem;
   padding: 4px 16px;
+  border-radius: 4px;
+  border: none;
 }
 
 .execute-button:hover {
@@ -76,6 +81,8 @@
 
 .delete-button {
   color: #DC2626;
+  border: none;
+  background: transparent;
 }
 
 .delete-button:hover {
@@ -98,15 +105,18 @@
 .agent-chip {
   font-weight: 600;
   font-size: 0.65rem;
+  border-radius: 12px;
+  padding: 2px 8px;
 }
 
 /* Execute Dialog */
 .execute-dialog-title {
-  /* Dialog title styles */
+  font-weight: 600;
+  padding: 24px 24px 16px 24px;
 }
 
 .execute-dialog-content {
-  /* Dialog content styles */
+  padding: 0 24px 16px 24px;
 }
 
 .repo-select {
@@ -114,15 +124,16 @@
 }
 
 .execute-dialog-actions {
-  /* Dialog actions styles */
+  padding: 16px 24px 24px 24px;
 }
 
 .cancel-button {
-  /* Cancel button styles */
+  color: #6b7280;
 }
 
 .confirm-execute-button {
   background-color: #FF4D1C;
+  color: white;
 }
 
 .confirm-execute-button:hover {

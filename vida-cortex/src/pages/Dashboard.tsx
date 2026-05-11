@@ -20,10 +20,10 @@ import { pipelines } from '../data/mockData';
 import { neuShadowSm } from '../data/theme';
 import '../styles/Dashboard.css';
 
-const ACCENT = '#FF4D1C';
+const ACCENT = '#0D9488';
 
 const kpis = [
-  { title: 'Total Pipelines', value: 10, icon: AllInclusiveIcon,   color: ACCENT,     bg: 'rgba(255,77,28,0.08)' },
+  { title: 'Total Pipelines', value: 10, icon: AllInclusiveIcon,   color: ACCENT,     bg: 'rgba(13,148,136,0.08)' },
   { title: 'Queued',          value: 2,  icon: HourglassEmptyIcon, color: '#D97706',  bg: 'rgba(245,158,11,0.08)' },
   { title: 'Running',         value: 3,  icon: PlayCircleIcon,     color: '#2563EB',  bg: 'rgba(59,130,246,0.08)' },
   { title: 'Successful',      value: 4,  icon: CheckCircleIcon,    color: '#059669',  bg: 'rgba(16,185,129,0.08)' },
@@ -43,15 +43,18 @@ const successData = [{ name: 'Success', value: 4 }, { name: 'Failure', value: 1 
 const tooltipStyle = {
   backgroundColor: '#fff',
   border: '1px solid rgba(0,0,0,0.08)',
-  borderRadius: 8,
+  borderRadius: '8px',
   color: '#111827',
   boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+  padding: '8px 12px',
+  fontSize: '12px'
 };
+
 const tickColor = '#9CA3AF';
 const gridColor = 'rgba(0,0,0,0.05)';
 
 const codeTagSx = {
-  bgcolor: 'rgba(255,77,28,0.07)',
+  bgcolor: 'rgba(13,148,136,0.07)',
   color: ACCENT,
   px: 0.8, py: 0.3,
   borderRadius: 1,
@@ -66,116 +69,143 @@ export default function Dashboard() {
 
   return (
     <div className={containerClass}>
-      {/* Page heading */}
-      <div className="dashboard-header">
-        <Typography variant="h4" className={`dashboard-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
-          Pipeline <span className="dashboard-title-accent">Overview</span>
-        </Typography>
-        <Typography variant="body2" className={`dashboard-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
-          Real-time status of all autonomous CI/CD pipelines
-        </Typography>
-      </div>
-
-      {/* KPI row */}
-      <div className="kpi-row">
-        {kpis.map((k) => <KpiCard key={k.title} {...k} />)}
-      </div>
-
-      {/* Main card */}
-      <Card>
-        <div className="main-card-tabs" style={{ borderBottomColor: theme.palette.divider }}>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-            <Tab label="Pipelines" />
-            <Tab label="Reports" />
-          </Tabs>
+      <div className="dashboard-content">
+        {/* Page heading */}
+        <div className="dashboard-header">
+          <Typography variant="h4" className={`dashboard-title ${isDark ? 'dark-theme' : 'light-theme'}`}>
+            Pipeline <span className="dashboard-title-accent">Overview</span>
+          </Typography>
+          <Typography variant="body2" className={`dashboard-subtitle ${isDark ? 'dark-theme' : 'light-theme'}`}>
+            Real-time status of all autonomous CI/CD pipelines
+          </Typography>
         </div>
 
-        <CardContent className="main-card-content">
-          {tab === 0 && (
-            <TableContainer className="pipelines-table">
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    {['Repository', 'Branch', 'Tech Stack', 'Stage', 'Status', 'App Name', 'Deploy Target', 'Deployed URL', 'Timestamp'].map((h) => (
-                      <TableCell key={h}>{h}</TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {pipelines.map((p) => (
-                    <TableRow key={p.id}>
-                      <TableCell className={`table-cell-repo ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.repo}</TableCell>
-                      <TableCell>
-                        <code className="branch-code">{p.branch}</code>
-                      </TableCell>
-                      <TableCell>{p.techStack}</TableCell>
-                      <TableCell className={`table-cell-stage ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.stage}</TableCell>
-                      <TableCell><StatusChip status={p.status} /></TableCell>
-                      <TableCell>{p.appName}</TableCell>
-                      <TableCell>{p.deployTarget}</TableCell>
-                      <TableCell>
-                        {p.deployedUrl !== '-'
-                          ? <Link href={p.deployedUrl} target="_blank" className="table-cell-url">{p.deployedUrl}</Link>
-                          : <Typography variant="caption" className={`table-cell-empty ${isDark ? 'dark-theme' : 'light-theme'}`}>—</Typography>}
-                      </TableCell>
-                      <TableCell className={`table-cell-timestamp ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.timestamp}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+        {/* KPI row */}
+        <div className="kpi-row">
+          {kpis.map((k) => <KpiCard key={k.title} {...k} />)}
+        </div>
 
-          {tab === 1 && (
-            <div className="reports-grid">
-              {[
-                { title: 'Pipeline Status Distribution', chart: (
-                  <PieChart>
-                    <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`} labelLine={{ stroke: tickColor }}>
-                      {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
-                    </Pie>
-                    <Tooltip contentStyle={tooltipStyle} />
-                  </PieChart>
-                )},
-                { title: 'Tech Stack Usage', chart: (
-                  <BarChart data={techData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={tooltipStyle} />
-                    <Bar dataKey="count" fill={ACCENT} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                )},
-                { title: 'Deploy Target Breakdown', chart: (
-                  <BarChart data={targetData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={tooltipStyle} />
-                    <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                )},
-                { title: 'Success vs Failure', chart: (
-                  <PieChart>
-                    <Pie data={successData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`} labelLine={{ stroke: tickColor }}>
-                      <Cell fill="#059669" /><Cell fill="#DC2626" />
-                    </Pie>
-                    <Tooltip contentStyle={tooltipStyle} />
-                    <Legend wrapperStyle={{ color: tickColor, fontSize: 12 }} />
-                  </PieChart>
-                )},
-              ].map(({ title, chart }) => (
-                <Paper key={title} className="chart-paper" style={{ boxShadow: neuShadowSm }}>
-                  <Typography variant="caption" className="chart-title">
-                    {title}
-                  </Typography>
-                  <ResponsiveContainer className="chart-container">{chart}</ResponsiveContainer>
-                </Paper>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        {/* Main card */}
+        <Card>
+          <div className="main-card-tabs" style={{ borderBottomColor: theme.palette.divider }}>
+            <Tabs value={tab} onChange={(_, v) => setTab(v)}>
+              <Tab label="Pipelines" />
+              <Tab label="Reports" />
+            </Tabs>
+          </div>
+
+          <CardContent className="main-card-content">
+            {tab === 0 && (
+              <TableContainer className="pipelines-table">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      {['Repository', 'Branch', 'Tech Stack', 'Stage', 'Status', 'App Name', 'Deploy Target', 'Deployed URL', 'Timestamp'].map((h) => (
+                        <TableCell key={h}>{h}</TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {pipelines.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell className={`table-cell-repo ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.repo}</TableCell>
+                        <TableCell>
+                          <code className="branch-code">{p.branch}</code>
+                        </TableCell>
+                        <TableCell>{p.techStack}</TableCell>
+                        <TableCell className={`table-cell-stage ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.stage}</TableCell>
+                        <TableCell><StatusChip status={p.status} /></TableCell>
+                        <TableCell>{p.appName}</TableCell>
+                        <TableCell>{p.deployTarget}</TableCell>
+                        <TableCell>
+                          {p.deployedUrl !== '-'
+                            ? <Link href={p.deployedUrl} target="_blank" className="table-cell-url">{p.deployedUrl}</Link>
+                            : <Typography variant="caption" className={`table-cell-empty ${isDark ? 'dark-theme' : 'light-theme'}`}>—</Typography>}
+                        </TableCell>
+                        <TableCell className={`table-cell-timestamp ${isDark ? 'dark-theme' : 'light-theme'}`}>{p.timestamp}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+
+            {tab === 1 && (
+              <div className="reports-grid">
+                {[
+                  { title: 'Pipeline Status Distribution', chart: (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie 
+                          data={pieData} 
+                          cx="50%" 
+                          cy="50%" 
+                          outerRadius={60} 
+                          dataKey="value" 
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {pieData.map((_, i) => <Cell key={`cell-${i}`} fill={PIE_COLORS[i]} />)}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )},
+                  { title: 'Tech Stack Usage', chart: (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={techData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+                        <Tooltip />
+                        <Bar dataKey="count" fill={ACCENT} radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )},
+                  { title: 'Deploy Target Breakdown', chart: (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={targetData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#2563EB" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )},
+                  { title: 'Success vs Failure', chart: (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie 
+                          data={successData} 
+                          cx="50%" 
+                          cy="50%" 
+                          outerRadius={60} 
+                          dataKey="value" 
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          <Cell fill="#059669" />
+                          <Cell fill="#DC2626" />
+                        </Pie>
+                        <Tooltip />
+                        <Legend wrapperStyle={{ color: tickColor, fontSize: 12 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )},
+                ].map(({ title, chart }) => (
+                  <Paper key={title} className={`chart-paper ${isDark ? 'dark-theme' : 'light-theme'}`}>
+                    <Typography variant="caption" className="chart-title">
+                      {title}
+                    </Typography>
+                    <div className="chart-container">
+                      {chart}
+                    </div>
+                  </Paper>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

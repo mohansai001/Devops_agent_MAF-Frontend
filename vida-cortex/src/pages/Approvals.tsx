@@ -16,7 +16,7 @@ import { approvals } from '../data/mockData';
 import { getCurrentExecution, getWorkflows } from '../data/workflowStore';
 import '../styles/Approvals.css';
 
-const ACCENT = '#FF4D1C';
+const ACCENT = '#059669';
 
 // ── Agent definitions (dynamic, up to 20) ────────────────────
 const AGENT_ICONS = [SearchIcon, BuildIcon, StorageIcon, RocketLaunchIcon, GitHubIcon];
@@ -180,10 +180,10 @@ function StageStepper({ stageLogs }: { stageLogs: StageLog[] }) {
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5,
                   cursor: hasLogs ? 'pointer' : 'default',
                   px: 1, py: 0.5, borderRadius: 2, minWidth: 90,
-                  bgcolor: isSelected ? 'rgba(255,77,28,0.07)' : 'transparent',
-                  border: isSelected ? '1px solid rgba(255,77,28,0.25)' : '1px solid transparent',
+                  bgcolor: isSelected ? 'rgba(5,150,105,0.07)' : 'transparent',
+                  border: isSelected ? '1px solid rgba(5,150,105,0.25)' : '1px solid transparent',
                   transition: 'all 0.2s',
-                  '&:hover': hasLogs ? { bgcolor: 'rgba(255,77,28,0.05)' } : {},
+                  '&:hover': hasLogs ? { bgcolor: 'rgba(5,150,105,0.05)' } : {},
                 }}
               >
                 {sl.status === 'done'    && <CheckCircleIcon sx={{ fontSize: 18, color: '#059669' }} />}
@@ -218,7 +218,7 @@ function StageStepper({ stageLogs }: { stageLogs: StageLog[] }) {
           border: `1px solid ${
             stageLogs[activeIdx]?.status === 'failed' ? 'rgba(220,38,38,0.2)'
             : stageLogs[activeIdx]?.status === 'done'   ? 'rgba(5,150,105,0.15)'
-            : 'rgba(255,77,28,0.15)'
+            : 'rgba(5,150,105,0.15)'
           }`,
         }}>
           <Typography variant="caption" sx={{
@@ -627,14 +627,14 @@ export default function AgentQueue() {
   const currentExecution = getCurrentExecution();
   const currentWorkflow = currentExecution ? getWorkflows().find(w => w.id === currentExecution.workflowId) : null;
 
-  const branchCodeSx = { bgcolor: 'rgba(255,77,28,0.07)', color: ACCENT, px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
+  const branchCodeSx = { bgcolor: 'rgba(5,150,105,0.07)', color: ACCENT, px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
   const shaCodeSx    = { bgcolor: 'rgba(0,0,0,0.05)', color: '#6B7280', px: 0.8, py: 0.2, borderRadius: 1, fontSize: 11 };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Workflow Execution Header */}
       {currentExecution && currentWorkflow && (
-        <Card sx={{ bgcolor: 'rgba(255,77,28,0.05)', border: '1px solid rgba(255,77,28,0.2)' }}>
+  <Card sx={{ bgcolor: 'rgba(5,150,105,0.05)', border: '1px solid rgba(5,150,105,0.2)' }}>
           <CardContent sx={{ py: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box>

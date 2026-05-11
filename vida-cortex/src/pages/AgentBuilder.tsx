@@ -1,12 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Box, Card, CardContent, Typography, Button, Chip, useTheme, IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import BuildIcon from '@mui/icons-material/Build';
 import StorageIcon from '@mui/icons-material/Storage';
@@ -16,7 +14,6 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { saveWorkflow } from '../data/workflowStore';
 import '../styles/AgentBuilder.css';
 
-const ACCENT = '#FF4D1C';
 
 // Agent definitions
 const AGENT_ICONS = [SearchIcon, BuildIcon, StorageIcon, RocketLaunchIcon, GitHubIcon];
@@ -285,7 +282,6 @@ export default function AgentBuilder() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const repoName = searchParams.get('repo') || 'Select Repository';
   
   const [availableAgents, setAvailableAgents] = useState<Agent[]>(ALL_AGENTS);
   const [selectedAgents, setSelectedAgents] = useState<Agent[]>([]);
@@ -363,10 +359,6 @@ export default function AgentBuilder() {
       <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
         {/* Top bar */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1.5, mb: 2 }}>
-          <Chip
-            label={repoName}
-            sx={{ bgcolor: `${ACCENT}20`, color: ACCENT, fontWeight: 700, '& .MuiChip-label': { px: 1.5 } }}
-          />
           {selectedAgents.length > 0 && (
             <Button
               variant="contained"

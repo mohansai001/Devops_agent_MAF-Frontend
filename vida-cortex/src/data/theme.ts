@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 
 // Hybrid: Soft Neumorphism + Subtle Glass — VIDA Cortex
-// Accent: #FF4D1C | Base BG: #F3F4F6
+// Accent: #0D9488 | Base BG: #F3F4F6
 
 // ── Light tokens ──────────────────────────────────────────────
 const L_BG       = '#F3F4F6';
@@ -25,7 +25,7 @@ const D_NEU      = `6px 6px 16px rgba(0,0,0,0.4), -6px -6px 16px rgba(255,255,25
 const D_NEU_SM   = `3px 3px 10px rgba(0,0,0,0.35), -3px -3px 10px rgba(255,255,255,0.02)`;
 const D_NEU_IN   = `inset 3px 3px 8px rgba(0,0,0,0.35), inset -3px -3px 8px rgba(255,255,255,0.02)`;
 
-const ACCENT = '#FF4D1C';
+const ACCENT = '#0D9488';
 
 export const neuShadow      = L_NEU;
 export const neuShadowSm    = L_NEU_SM;
@@ -133,15 +133,15 @@ export function createAppTheme(isDark: boolean) {
             '&:hover': { transform: 'translateY(-2px)' },
           },
           contained: {
-            background: 'rgba(255,77,28,0.9)',
+            background: 'rgba(13,148,136,0.9)',
             backdropFilter: 'blur(6px)',
             WebkitBackdropFilter: 'blur(6px)',
             color: '#FFFFFF',
-            border: '1px solid rgba(255,77,28,0.4)',
-            boxShadow: `4px 4px 12px rgba(255,77,28,0.25), -2px -2px 8px rgba(255,255,255,0.5)`,
+            border: '1px solid rgba(13,148,136,0.4)',
+            boxShadow: `4px 4px 12px rgba(13,148,136,0.25), -2px -2px 8px rgba(255,255,255,0.5)`,
             '&:hover': {
-              background: 'rgba(230,61,10,0.92)',
-              boxShadow: `6px 6px 16px rgba(255,77,28,0.35), -2px -2px 8px rgba(255,255,255,0.6)`,
+              background: 'rgba(11,128,117,0.92)',
+              boxShadow: `6px 6px 16px rgba(13,148,136,0.35), -2px -2px 8px rgba(255,255,255,0.6)`,
             },
           },
           outlined: {
@@ -160,7 +160,7 @@ export function createAppTheme(isDark: boolean) {
           },
           text: {
             color: TEXT_SEC,
-            '&:hover': { color: ACCENT, background: 'rgba(255,77,28,0.05)' },
+            '&:hover': { color: ACCENT, background: 'rgba(13,148,136,0.05)' },
           },
         },
       },
@@ -243,7 +243,7 @@ export function createAppTheme(isDark: boolean) {
               borderRadius: 12,
               boxShadow: neuInset,
               '& fieldset': { border: `1px solid ${BORDER}` },
-              '&:hover fieldset': { borderColor: 'rgba(255,77,28,0.3)' },
+              '&:hover fieldset': { borderColor: 'rgba(13,148,136,0.3)' },
               '&.Mui-focused fieldset': { borderColor: ACCENT, borderWidth: 2 },
             },
           },
@@ -305,7 +305,7 @@ export function createAppTheme(isDark: boolean) {
       MuiLinearProgress: {
         styleOverrides: {
           root: { borderRadius: 4, backgroundColor: 'rgba(0,0,0,0.05)' },
-          bar:  { background: `linear-gradient(90deg, ${ACCENT}, #FF8C69)` },
+          bar:  { background: `linear-gradient(90deg, ${ACCENT}, #2DD4BF)` },
         },
       },
       MuiAlert: {
@@ -324,7 +324,7 @@ export function createAppTheme(isDark: boolean) {
         styleOverrides: {
           root: {
             transition: 'all 0.2s ease',
-            '&:hover': { color: ACCENT, background: 'rgba(255,77,28,0.06)' },
+            '&:hover': { color: ACCENT, background: 'rgba(13,148,136,0.06)' },
           },
         },
       },

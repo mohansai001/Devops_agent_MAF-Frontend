@@ -23,11 +23,11 @@ const navItems = [
   { label: 'Approvals',        icon: CheckCircleIcon,      path: '/approvals' },
   { label: 'Agent Builder',    icon: SettingsIcon,         path: '/agent-builder' },
   { label: 'Workflows',        icon: AccountTreeIcon,      path: '/workflows' },
-  { label: 'Repositories',     icon: FolderIcon,           path: '/repos' },
-  { label: 'Onboarding',       icon: AddCircleOutlineIcon, path: '/onboarding' },
-  { label: 'Deployments',      icon: RocketLaunchIcon,     path: '/deployments' },
-  { label: 'Builds',           icon: BuildIcon,            path: '/builds' },
-  { label: 'Failed Pipelines', icon: ErrorIcon,            path: '/failed-pipelines' },
+  // { label: 'Repositories',     icon: FolderIcon,           path: '/repos' },
+  // { label: 'Onboarding',       icon: AddCircleOutlineIcon, path: '/onboarding' },
+  // { label: 'Deployments',      icon: RocketLaunchIcon,     path: '/deployments' },
+  // { label: 'Builds',           icon: BuildIcon,            path: '/builds' },
+  // { label: 'Failed Pipelines', icon: ErrorIcon,            path: '/failed-pipelines' },
 ];
 
 export const SIDEBAR_W = 220;
@@ -79,10 +79,10 @@ export default function Sidebar({ onWidthChange }: Props) {
       {/* Logo */}
       <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 2.5, gap: 1.5, minHeight: 64 }}>
         <Box sx={{
-          width: 36, height: 36, borderRadius: 2, bgcolor: '#FF4D1C',
+          width: 36, height: 36, borderRadius: 2, bgcolor: '#0D9488',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
-          boxShadow: '3px 3px 10px rgba(255,77,28,0.35)',
+          boxShadow: '3px 3px 10px rgba(13,148,136,0.35)',
         }}>
           <CloudUploadIcon sx={{ color: '#fff', fontSize: 20 }} />
         </Box>
@@ -103,7 +103,7 @@ export default function Sidebar({ onWidthChange }: Props) {
             bgcolor: btnBg,
             boxShadow: neuShadowSm,
             borderRadius: 2,
-            '&:hover': { color: '#FF4D1C' },
+            '&:hover': { color: '#0D9488' },
           }}
         >
           <MenuIcon fontSize="small" />
@@ -122,17 +122,17 @@ export default function Sidebar({ onWidthChange }: Props) {
                   borderRadius: 2,
                   mb: 0.5,
                   px: collapsed ? 1.5 : 1.5,
-                  bgcolor: active ? 'rgba(255,77,28,0.08)' : 'transparent',
+                  bgcolor: active ? 'rgba(13,148,136,0.08)' : 'transparent',
                   boxShadow: active ? neuShadowSm : 'none',
-                  borderLeft: active ? '3px solid #FF4D1C' : '3px solid transparent',
+                  borderLeft: active ? '3px solid #0D9488' : '3px solid transparent',
                   transition: 'all 0.2s ease',
-                  '&:hover': { bgcolor: 'rgba(255,77,28,0.05)', transform: 'translateX(2px)' },
+                  '&:hover': { bgcolor: 'rgba(13,148,136,0.05)', transform: 'translateX(2px)' },
                   justifyContent: collapsed ? 'center' : 'flex-start',
                 }}
               >
                 <ListItemIcon sx={{
                   minWidth: collapsed ? 0 : 36,
-                  color: active ? '#FF4D1C' : iconSec,
+                  color: active ? '#0D9488' : iconSec,
                   transition: 'color 0.2s ease',
                 }}>
                   <Icon fontSize="small" />
@@ -143,7 +143,7 @@ export default function Sidebar({ onWidthChange }: Props) {
                     primaryTypographyProps={{
                       fontSize: 13,
                       fontWeight: active ? 700 : 500,
-                      color: active ? '#FF4D1C' : textSec,
+                      color: active ? '#0D9488' : textSec,
                     }}
                   />
                 )}

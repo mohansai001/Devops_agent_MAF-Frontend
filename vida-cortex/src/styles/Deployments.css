@@ -1,6 +1,7 @@
 /* Deployments Page Styles */
 .deployments-container {
-  /* Main container */
+  padding: 24px;
+  min-height: 100vh;
 }
 
 .deployments-header {
@@ -11,6 +12,8 @@
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
 .deployments-title-accent {
@@ -24,11 +27,11 @@
 
 /* Table Styles */
 .deployments-table-container {
-  /* Table container */
+  width: 100%;
 }
 
 .deployments-table {
-  /* Table styles */
+  width: 100%;
 }
 
 .table-cell-app {
@@ -45,6 +48,7 @@
   border-radius: 4px;
   font-weight: 600;
   font-size: 12px;
+  display: inline-block;
 }
 
 .env-production {
@@ -72,11 +76,17 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
+  font-family: monospace;
 }
 
 .table-cell-url {
   font-size: 12px;
   color: #FF4D1C;
+  text-decoration: none;
+}
+
+.table-cell-url:hover {
+  text-decoration: underline;
 }
 
 .table-cell-timestamp {
@@ -84,16 +94,16 @@
 }
 
 .table-cell-empty {
-  /* Empty URL cell */
+  font-size: 12px;
 }
 
 /* Theme Support */
 .light-theme .deployments-container {
-  background-color: #fff;
+  background-color: #f8fafc;
 }
 
 .dark-theme .deployments-container {
-  background-color: #1a1a1a;
+  background-color: #0f0f0f;
 }
 
 .light-theme .deployments-title {

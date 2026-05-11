@@ -36,12 +36,12 @@ export default function Header({ title, sidebarWidth }: Props) {
             {title}
           </Typography>
           <Chip
-            icon={<SmartToyIcon sx={{ fontSize: '14px !important', color: '#FF4D1C !important' }} />}
+            icon={<SmartToyIcon sx={{ fontSize: '14px !important', color: '#0D9488 !important' }} />}
             label="Agent Active"
             size="small"
             sx={{
-              bgcolor: 'rgba(255,77,28,0.08)',
-              color: '#FF4D1C',
+              bgcolor: 'rgba(13,148,136,0.08)',
+              color: '#0D9488',
               fontWeight: 600,
               fontSize: 11,
               border: 'none',
@@ -67,11 +67,11 @@ export default function Header({ title, sidebarWidth }: Props) {
             sx={{
               width: 34,
               height: 34,
-              bgcolor: '#FF4D1C',
+              bgcolor: '#0D9488',
               fontSize: 13,
               color: '#fff',
               fontWeight: 700,
-              boxShadow: '3px 3px 10px rgba(255,77,28,0.3)',
+              boxShadow: '3px 3px 10px rgba(13,148,136,0.3)',
             }}
           >
             JD
