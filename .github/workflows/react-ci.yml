@@ -1,4 +1,4 @@
-name: React CI Pipeline
+name: React CI/CD Pipeline
 
 on:
   push:
@@ -74,7 +74,7 @@ jobs:
           exit-code: 1
 
   deploy:
-    name: Deploy to S3
+    name: Deploy to Azure Storage Static Website
     runs-on: ubuntu-latest
     needs: [build, sast]
 
@@ -86,15 +86,20 @@ jobs:
           name: react-app
           path: dist
 
-      # Configure AWS Credentials
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      # Azure Login
+      - name: Azure Login
+        uses: azure/login@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Deploy to S3
-      - name: Deploy to S3
-        run: |
-          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+      # Upload to Azure Storage Static Website
+      - name: Deploy to Azure Storage
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} \
+              --destination '$web' \
+              --source dist \
+              --auth-mode login \
+              --overwrite
