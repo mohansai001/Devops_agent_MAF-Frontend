@@ -144,7 +144,7 @@ export default function AgentOnboarding() {
     switch (status) {
       case 'active': return <CheckCircleIcon fontSize="small" />;
       case 'pending': return <PendingIcon fontSize="small" />;
-      default: return null;
+      default: return undefined;
     }
   };
 
