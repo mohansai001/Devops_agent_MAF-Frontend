@@ -1,4 +1,4 @@
-name: React CI Pipeline
+name: React CI/CD Pipeline
 
 on:
   push:
@@ -33,16 +33,12 @@ jobs:
         working-directory: ./vida-cortex
         run: npm run build
 
-      # Archive build output
-      - name: Archive Build
-        run: zip -r react-app.zip vida-cortex/dist
-
-      # Upload artifact
-      - name: Upload Artifact
+      # Upload dist folder as artifact
+      - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: react-app
-          path: react-app.zip
+          path: vida-cortex/dist
 
   sast:
     name: Security Scan (SAST)
@@ -61,7 +57,11 @@ jobs:
 
       # Gitleaks
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect \
+            --source="/path" \
+            --verbose \
+            --redact
 
       # Trivy
       - name: Run Trivy FS Scan
@@ -74,38 +74,32 @@ jobs:
           exit-code: 1
 
   deploy:
-    name: Deploy to S3
+    name: Deploy to Azure Storage Static Website
     runs-on: ubuntu-latest
     needs: [build, sast]
 
-    defaults:
-      run:
-        working-directory: ./vida-cortex
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      # Download artifact from build job
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
         with:
-          node-version: 18
+          name: react-app
+          path: dist
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build App
-        run: npm run build
-
-      # Configure AWS
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      # Azure Login
+      - name: Azure Login
+        uses: azure/login@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Deploy to S3
-      - name: Deploy to S3
-        run: |
-          aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+      # Upload to Azure Storage Static Website
+      - name: Deploy to Azure Storage
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name ${{ secrets.STORAGE_ACCOUNT_NAME }} \
+              --destination '$web' \
+              --source dist \
+              --auth-mode login \
+              --overwrite
