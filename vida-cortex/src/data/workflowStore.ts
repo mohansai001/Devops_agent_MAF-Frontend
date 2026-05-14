@@ -20,6 +20,7 @@ export interface WorkflowExecution {
   repository: string;
   startedAt: string;
   status: 'running' | 'completed' | 'failed';
+  recordId?: number;
 }
 
 const STORAGE_KEY = 'vida_workflows';
@@ -49,12 +50,13 @@ export function deleteWorkflow(id: string): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows));
 }
 
-export function startWorkflowExecution(workflowId: string, repository: string): void {
+export function startWorkflowExecution(workflowId: string, repository: string, recordId?: number): void {
   const execution: WorkflowExecution = {
     workflowId,
     repository,
     startedAt: new Date().toISOString(),
-    status: 'running'
+    status: 'running',
+    recordId
   };
   localStorage.setItem(EXECUTION_KEY, JSON.stringify(execution));
 }
@@ -72,6 +74,49 @@ export function clearCurrentExecution(): void {
   localStorage.removeItem(EXECUTION_KEY);
 }
 
+// Fetch workflows from API
+export async function fetchWorkflowsFromAPI(): Promise<Workflow[]> {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/sql/sql/get_workflows');
+    const data = await response.json();
+    
+    // Transform API response to Workflow format
+    const workflows: Workflow[] = data.map((wf: any) => {
+      const detail = wf.details?.[0];
+      const agents = detail?.agents || [];
+      
+      return {
+        id: `wf-${wf.id}`,
+        name: wf.name,
+        createdAt: detail?.created_at || new Date().toISOString(),
+        agents: agents.map((agentName: string, index: number) => {
+          const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+          const labels: { [key: string]: string } = {
+            'github_agent': 'Github',
+            'yaml_agent': 'Yaml',
+            'terraform_agent': 'Terraform'
+          };
+          
+          return {
+            id: `agent-${index}`,
+            label: labels[agentName] || agentName.replace(/_agent$/, '').replace(/_/g, ' '),
+            color: colors[index % colors.length],
+            task: `Processing ${labels[agentName] || agentName}...`,
+            success: `${labels[agentName] || agentName} completed successfully`
+          };
+        })
+      };
+    });
+    
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows));
+    return workflows;
+  } catch (error) {
+    console.error('Failed to fetch workflows from API:', error);
+    return getWorkflows(); // Fallback to localStorage
+  }
+}
+
 // Demo workflow for testing
 export function createDemoWorkflow(): void {
   const demoWorkflow: Workflow = {
@@ -82,44 +127,34 @@ export function createDemoWorkflow(): void {
     agents: [
       {
         id: 'agent-0',
-        label: 'Code Analysis',
+        label: 'Github',
         color: '#3B82F6',
         task: 'Analyzing code quality and security vulnerabilities...',
         success: 'Code analysis complete — no critical issues found'
       },
       {
         id: 'agent-1',
-        label: 'Build',
+        label: 'Yaml',
         color: '#10B981',
         task: 'Compiling and building application artifacts...',
         success: 'Build successful — artifacts generated'
       },
       {
         id: 'agent-2',
-        label: 'Test Suite',
+        label: 'Terraform',
         color: '#F59E0B',
         task: 'Running comprehensive test suite...',
         success: 'All tests passed — 98% coverage achieved'
-      },
-      {
-        id: 'agent-3',
-        label: 'Security Scan',
-        color: '#EF4444',
-        task: 'Scanning for security vulnerabilities...',
-        success: 'Security scan complete — no vulnerabilities detected'
-      },
-      {
-        id: 'agent-4',
-        label: 'Deploy',
-        color: '#8B5CF6',
-        task: 'Deploying to staging environment...',
-        success: 'Deployment successful — application is live'
       }
     ]
   };
   
   const workflows = getWorkflows();
-  if (!workflows.find(w => w.id === demoWorkflow.id)) {
+  const existingIndex = workflows.findIndex(w => w.id === demoWorkflow.id);
+  if (existingIndex >= 0) {
+    workflows[existingIndex] = demoWorkflow;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(workflows));
+  } else {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...workflows, demoWorkflow]));
   }
 }

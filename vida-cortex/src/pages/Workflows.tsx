@@ -3,8 +3,16 @@ import { Card, CardContent, Typography, IconButton, Chip, useTheme, Button, Dial
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useNavigate } from 'react-router-dom';
-import { getWorkflows, deleteWorkflow, startWorkflowExecution, createDemoWorkflow, Workflow } from '../data/workflowStore';
+import { getWorkflows, deleteWorkflow, startWorkflowExecution, fetchWorkflowsFromAPI, Workflow } from '../data/workflowStore';
 import '../styles/Workflows.css';
+
+interface TriggeredRecord {
+  id: number;
+  repo: string;
+  branch: string;
+  commit_sha: string;
+  status: string;
+}
 
 
 export default function Workflows() {
@@ -14,22 +22,30 @@ export default function Workflows() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [executeDialog, setExecuteDialog] = useState<{ open: boolean; workflow: Workflow | null }>({ open: false, workflow: null });
   const [selectedRepo, setSelectedRepo] = useState('');
-
-  // Mock repositories - replace with actual data source
-  const repositories = [
-    'frontend-app',
-    'backend-api', 
-    'mobile-app',
-    'data-pipeline',
-    'ml-service'
-  ];
+  const [repositories, setRepositories] = useState<TriggeredRecord[]>([]);
 
   const containerClass = `workflows-container ${isDark ? 'dark-theme' : 'light-theme'}`;
 
   useEffect(() => {
-    createDemoWorkflow(); // Create demo workflow if it doesn't exist
-    setWorkflows(getWorkflows());
+    loadWorkflows();
+    fetchRepositories();
   }, []);
+
+  const loadWorkflows = async () => {
+    const apiWorkflows = await fetchWorkflowsFromAPI();
+    setWorkflows(apiWorkflows);
+  };
+
+  const fetchRepositories = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/sql/sql/get_all_triggered_records');
+      const data = await response.json();
+      setRepositories(data);
+    } catch (error) {
+      console.error('Failed to fetch repositories:', error);
+      setRepositories([]);
+    }
+  };
 
   const handleDelete = (id: string) => {
     deleteWorkflow(id);
@@ -41,11 +57,14 @@ export default function Workflows() {
     setSelectedRepo('');
   };
 
-  const handleConfirmExecute = () => {
+  const handleConfirmExecute = async () => {
     if (executeDialog.workflow && selectedRepo) {
-      startWorkflowExecution(executeDialog.workflow.id, selectedRepo);
-      setExecuteDialog({ open: false, workflow: null });
-      navigate('/approvals');
+      const selectedRecord = repositories.find(r => r.repo === selectedRepo);
+      if (selectedRecord) {
+        startWorkflowExecution(executeDialog.workflow.id, selectedRepo, selectedRecord.id);
+        setExecuteDialog({ open: false, workflow: null });
+        navigate('/approvals');
+      }
     }
   };
 
@@ -133,9 +152,9 @@ export default function Workflows() {
             onChange={(e) => setSelectedRepo(e.target.value)}
             className="repo-select"
           >
-            {repositories.map((repo) => (
-              <MenuItem key={repo} value={repo}>
-                {repo}
+            {repositories.map((record) => (
+              <MenuItem key={record.id} value={record.repo}>
+                {record.repo}
               </MenuItem>
             ))}
           </TextField>

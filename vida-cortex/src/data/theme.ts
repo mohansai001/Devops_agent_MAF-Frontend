@@ -14,16 +14,16 @@ const L_NEU      = `6px 6px 16px rgba(0,0,0,0.08), -6px -6px 16px rgba(255,255,2
 const L_NEU_SM   = `3px 3px 10px rgba(0,0,0,0.07), -3px -3px 10px rgba(255,255,255,0.75)`;
 const L_NEU_IN   = `inset 3px 3px 8px rgba(0,0,0,0.07), inset -3px -3px 8px rgba(255,255,255,0.75)`;
 
-// ── Dark tokens ───────────────────────────────────────────────
-const D_BG       = '#0F1117';
-const D_GLASS    = 'rgba(255,255,255,0.05)';
-const D_GLASS_SM = 'rgba(255,255,255,0.03)';
-const D_BORDER   = 'rgba(255,255,255,0.08)';
-const D_TEXT_PRI = '#F9FAFB';
-const D_TEXT_SEC = '#9CA3AF';
-const D_NEU      = `6px 6px 16px rgba(0,0,0,0.4), -6px -6px 16px rgba(255,255,255,0.03)`;
-const D_NEU_SM   = `3px 3px 10px rgba(0,0,0,0.35), -3px -3px 10px rgba(255,255,255,0.02)`;
-const D_NEU_IN   = `inset 3px 3px 8px rgba(0,0,0,0.35), inset -3px -3px 8px rgba(255,255,255,0.02)`;
+// ── Dark tokens (Improved for better contrast and readability) ──
+const D_BG       = '#0A0E1A';  // Deeper, richer dark blue-black
+const D_GLASS    = 'rgba(255,255,255,0.08)';  // More visible glass effect
+const D_GLASS_SM = 'rgba(255,255,255,0.05)';  // Subtle glass
+const D_BORDER   = 'rgba(255,255,255,0.12)';  // More visible borders
+const D_TEXT_PRI = '#F3F4F6';  // Softer white for less eye strain
+const D_TEXT_SEC = '#9CA3AF';  // Keep secondary text
+const D_NEU      = `6px 6px 18px rgba(0,0,0,0.5), -2px -2px 12px rgba(255,255,255,0.04)`;
+const D_NEU_SM   = `3px 3px 12px rgba(0,0,0,0.4), -2px -2px 8px rgba(255,255,255,0.03)`;
+const D_NEU_IN   = `inset 3px 3px 10px rgba(0,0,0,0.4), inset -2px -2px 8px rgba(255,255,255,0.03)`;
 
 const ACCENT = '#0D9488';
 
@@ -121,7 +121,7 @@ export function createAppTheme(isDark: boolean) {
         },
       },
 
-      // ── Buttons ────────────────────────────────────────────
+      // ── Buttons (Improved dark mode) ──────────────────────
       MuiButton: {
         styleOverrides: {
           root: {
@@ -138,14 +138,20 @@ export function createAppTheme(isDark: boolean) {
             WebkitBackdropFilter: 'blur(6px)',
             color: '#FFFFFF',
             border: '1px solid rgba(13,148,136,0.4)',
-            boxShadow: `4px 4px 12px rgba(13,148,136,0.25), -2px -2px 8px rgba(255,255,255,0.5)`,
+            boxShadow: isDark
+              ? `4px 4px 16px rgba(13,148,136,0.3), -2px -2px 10px rgba(255,255,255,0.05)`
+              : `4px 4px 12px rgba(13,148,136,0.25), -2px -2px 8px rgba(255,255,255,0.5)`,
             '&:hover': {
               background: 'rgba(11,128,117,0.92)',
-              boxShadow: `6px 6px 16px rgba(13,148,136,0.35), -2px -2px 8px rgba(255,255,255,0.6)`,
+              boxShadow: isDark
+                ? `6px 6px 20px rgba(13,148,136,0.4), -2px -2px 12px rgba(255,255,255,0.06)`
+                : `6px 6px 16px rgba(13,148,136,0.35), -2px -2px 8px rgba(255,255,255,0.6)`,
             },
           },
           outlined: {
-            borderColor: 'rgba(0,0,0,0.1)',
+            borderColor: isDark 
+              ? 'rgba(255,255,255,0.15)' 
+              : 'rgba(0,0,0,0.1)',
             color: TEXT_PRI,
             background: GLASS_SM,
             backdropFilter: 'blur(6px)',
@@ -160,7 +166,12 @@ export function createAppTheme(isDark: boolean) {
           },
           text: {
             color: TEXT_SEC,
-            '&:hover': { color: ACCENT, background: 'rgba(13,148,136,0.05)' },
+            '&:hover': { 
+              color: ACCENT, 
+              background: isDark 
+                ? 'rgba(13,148,136,0.1)' 
+                : 'rgba(13,148,136,0.05)' 
+            },
           },
         },
       },
@@ -181,13 +192,17 @@ export function createAppTheme(isDark: boolean) {
         },
       },
 
-      // ── Table ──────────────────────────────────────────────
+      // ── Table Head (Improved dark mode) ───────────────────
       MuiTableHead: {
         styleOverrides: {
           root: {
             '& .MuiTableCell-root': {
-              background: 'rgba(255,255,255,0.4)',
-              borderBottom: '1px solid rgba(0,0,0,0.06)',
+              background: isDark 
+                ? 'rgba(255,255,255,0.06)' 
+                : 'rgba(255,255,255,0.4)',
+              borderBottom: isDark 
+                ? '1px solid rgba(255,255,255,0.1)' 
+                : '1px solid rgba(0,0,0,0.06)',
               fontWeight: 700,
               color: TEXT_SEC,
               textTransform: 'uppercase',
@@ -201,8 +216,16 @@ export function createAppTheme(isDark: boolean) {
         styleOverrides: {
           root: {
             transition: 'background 0.15s ease',
-            '&:hover': { background: 'rgba(255,255,255,0.5)' },
-            '& .MuiTableCell-root': { borderBottom: '1px solid rgba(0,0,0,0.04)' },
+            '&:hover': { 
+              background: isDark 
+                ? 'rgba(255,255,255,0.08)' 
+                : 'rgba(255,255,255,0.5)' 
+            },
+            '& .MuiTableCell-root': { 
+              borderBottom: isDark 
+                ? '1px solid rgba(255,255,255,0.06)' 
+                : '1px solid rgba(0,0,0,0.04)' 
+            },
           },
         },
       },
@@ -232,34 +255,47 @@ export function createAppTheme(isDark: boolean) {
         },
       },
 
-      // ── TextField ──────────────────────────────────────────
+      // ── TextField (Improved dark mode) ────────────────────
       MuiTextField: {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              background: 'rgba(255,255,255,0.5)',
+              background: isDark 
+                ? 'rgba(255,255,255,0.04)' 
+                : 'rgba(255,255,255,0.5)',
               backdropFilter: 'blur(6px)',
               WebkitBackdropFilter: 'blur(6px)',
               borderRadius: 12,
               boxShadow: neuInset,
               '& fieldset': { border: `1px solid ${BORDER}` },
-              '&:hover fieldset': { borderColor: 'rgba(13,148,136,0.3)' },
+              '&:hover fieldset': { 
+                borderColor: isDark 
+                  ? 'rgba(13,148,136,0.5)' 
+                  : 'rgba(13,148,136,0.3)' 
+              },
               '&.Mui-focused fieldset': { borderColor: ACCENT, borderWidth: 2 },
+            },
+            '& .MuiInputBase-input': {
+              color: TEXT_PRI,
             },
           },
         },
       },
 
-      // ── Dialog ─────────────────────────────────────────────
+      // ── Dialog (Improved dark mode) ───────────────────────
       MuiDialog: {
         styleOverrides: {
           paper: {
             backgroundImage: 'none',
-            background: 'rgba(255,255,255,0.75)',
+            background: isDark 
+              ? 'rgba(15,17,26,0.95)' 
+              : 'rgba(255,255,255,0.75)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             border: `1px solid ${BORDER}`,
-            boxShadow: `12px 12px 32px rgba(0,0,0,0.1), -12px -12px 32px rgba(255,255,255,0.85)`,
+            boxShadow: isDark
+              ? `12px 12px 40px rgba(0,0,0,0.6), -4px -4px 24px rgba(255,255,255,0.04)`
+              : `12px 12px 32px rgba(0,0,0,0.1), -12px -12px 32px rgba(255,255,255,0.85)`,
             borderRadius: 20,
           },
         },
@@ -280,9 +316,15 @@ export function createAppTheme(isDark: boolean) {
         },
       },
 
-      // ── Misc ───────────────────────────────────────────────
+      // ── Misc (Improved dark mode) ─────────────────────────
       MuiDivider: {
-        styleOverrides: { root: { borderColor: 'rgba(0,0,0,0.06)' } },
+        styleOverrides: { 
+          root: { 
+            borderColor: isDark 
+              ? 'rgba(255,255,255,0.08)' 
+              : 'rgba(0,0,0,0.06)' 
+          } 
+        },
       },
       MuiStepLabel: {
         styleOverrides: {
@@ -296,7 +338,9 @@ export function createAppTheme(isDark: boolean) {
       MuiStepIcon: {
         styleOverrides: {
           root: {
-            color: 'rgba(0,0,0,0.15)',
+            color: isDark 
+              ? 'rgba(255,255,255,0.15)' 
+              : 'rgba(0,0,0,0.15)',
             '&.Mui-active':    { color: ACCENT },
             '&.Mui-completed': { color: ACCENT },
           },
@@ -304,7 +348,12 @@ export function createAppTheme(isDark: boolean) {
       },
       MuiLinearProgress: {
         styleOverrides: {
-          root: { borderRadius: 4, backgroundColor: 'rgba(0,0,0,0.05)' },
+          root: { 
+            borderRadius: 4, 
+            backgroundColor: isDark 
+              ? 'rgba(255,255,255,0.1)' 
+              : 'rgba(0,0,0,0.05)' 
+          },
           bar:  { background: `linear-gradient(90deg, ${ACCENT}, #2DD4BF)` },
         },
       },

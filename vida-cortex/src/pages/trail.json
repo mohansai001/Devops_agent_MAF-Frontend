@@ -1,0 +1,440 @@
+{
+  "messages": [
+    {
+      "role": "assistant",
+      "contents": [
+        {
+          "type": "text_reasoning",
+          "annotations": null,
+          "additional_properties": {},
+          "raw_representation": {
+            "id": "rs_0ffbc7e873ecdd13006a05611a8d788193aaf8b44bbc5351e8",
+            "summary": [],
+            "type": "reasoning",
+            "content": null,
+            "encrypted_content": null,
+            "status": null
+          },
+          "text": "",
+          "protected_data": null,
+          "uri": null,
+          "media_type": null,
+          "message": null,
+          "error_code": null,
+          "error_details": null,
+          "usage_details": null,
+          "call_id": null,
+          "name": null,
+          "arguments": null,
+          "exception": null,
+          "result": null,
+          "items": null,
+          "file_id": null,
+          "vector_store_id": null,
+          "inputs": null,
+          "outputs": null,
+          "image_id": null,
+          "commands": null,
+          "timeout_ms": null,
+          "max_output_length": null,
+          "status": null,
+          "stdout": null,
+          "stderr": null,
+          "exit_code": null,
+          "timed_out": null,
+          "tool_name": null,
+          "server_name": null,
+          "output": null,
+          "id": "rs_0ffbc7e873ecdd13006a05611a8d788193aaf8b44bbc5351e8",
+          "function_call": null,
+          "user_input_request": null,
+          "approved": null,
+          "consent_link": null
+        },
+        {
+          "type": "text",
+          "annotations": null,
+          "additional_properties": {},
+          "raw_representation": {
+            "annotations": [],
+            "text": "Saved-as: .github/workflows/ci.yml\n\n```yaml\nname: CI\n\non:\n  push:\n    branches: [ \"main\" ]\n  pull_request:\n    branches: [ \"main\" ]\n  workflow_dispatch:\n\npermissions:\n  contents: read\n  security-events: write\n\nenv:\n  CI: true\n\njobs:\n  build:\n    name: Build · Test · Lint\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Lint\n        run: npm run lint --if-present\n\n      - name: Run tests\n        run: npm test --if-present --silent\n\n      - name: Build\n        run: npm run build --if-present\n\n  codeql-sast:\n    name: CodeQL SAST Analysis\n    needs: build\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      security-events: write\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Initialize CodeQL\n        uses: github/codeql-action/init@v2\n        with:\n          languages: javascript\n\n      - name: Install dependencies (for CodeQL build)\n        run: npm ci\n\n      - name: Build (for CodeQL)\n        run: npm run build --if-present\n\n      - name: Perform CodeQL analysis\n        uses: github/codeql-action/analyze@v2\n```\n\nNotes / requirements\n- Defaults applied:\n  - Node.js: 18 (single-version matrix). Edit strategy.matrix.node-version to run additional versions.\n  - Package manager: npm (uses npm ci). If you use yarn or pnpm, replace install steps and adjust setup-node caching.\n  - Scripts assumed: lint -> npm run lint, test -> npm test, build -> npm run build. All guarded with --if-present; change if your repository uses different script names.\n- SAST (CodeQL):\n  - CodeQL steps are included (github/codeql-action). The built-in GITHUB_TOKEN is used automatically; no additional secret is required for public repositories.\n  - For private repositories, GitHub Advanced Security may be required to enable full CodeQL features and alerts.\n  - Ensure repository Actions permissions allow security-events: write (the workflow sets this).\n- DAST: No DAST steps included (Enable_DAST = false).\n- Save this file at: .github/workflows/ci.yml\n- If you want caching tuned (e.g., explicit actions/cache for ~/.npm or node_modules), test/coverage artifact upload, test report publishing, or a Node version matrix, tell me and I will update the workflow.",
+            "type": "output_text",
+            "logprobs": []
+          },
+          "text": "Saved-as: .github/workflows/ci.yml\n\n```yaml\nname: CI\n\non:\n  push:\n    branches: [ \"main\" ]\n  pull_request:\n    branches: [ \"main\" ]\n  workflow_dispatch:\n\npermissions:\n  contents: read\n  security-events: write\n\nenv:\n  CI: true\n\njobs:\n  build:\n    name: Build · Test · Lint\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Lint\n        run: npm run lint --if-present\n\n      - name: Run tests\n        run: npm test --if-present --silent\n\n      - name: Build\n        run: npm run build --if-present\n\n  codeql-sast:\n    name: CodeQL SAST Analysis\n    needs: build\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      security-events: write\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Initialize CodeQL\n        uses: github/codeql-action/init@v2\n        with:\n          languages: javascript\n\n      - name: Install dependencies (for CodeQL build)\n        run: npm ci\n\n      - name: Build (for CodeQL)\n        run: npm run build --if-present\n\n      - name: Perform CodeQL analysis\n        uses: github/codeql-action/analyze@v2\n```\n\nNotes / requirements\n- Defaults applied:\n  - Node.js: 18 (single-version matrix). Edit strategy.matrix.node-version to run additional versions.\n  - Package manager: npm (uses npm ci). If you use yarn or pnpm, replace install steps and adjust setup-node caching.\n  - Scripts assumed: lint -> npm run lint, test -> npm test, build -> npm run build. All guarded with --if-present; change if your repository uses different script names.\n- SAST (CodeQL):\n  - CodeQL steps are included (github/codeql-action). The built-in GITHUB_TOKEN is used automatically; no additional secret is required for public repositories.\n  - For private repositories, GitHub Advanced Security may be required to enable full CodeQL features and alerts.\n  - Ensure repository Actions permissions allow security-events: write (the workflow sets this).\n- DAST: No DAST steps included (Enable_DAST = false).\n- Save this file at: .github/workflows/ci.yml\n- If you want caching tuned (e.g., explicit actions/cache for ~/.npm or node_modules), test/coverage artifact upload, test report publishing, or a Node version matrix, tell me and I will update the workflow.",
+          "protected_data": null,
+          "uri": null,
+          "media_type": null,
+          "message": null,
+          "error_code": null,
+          "error_details": null,
+          "usage_details": null,
+          "call_id": null,
+          "name": null,
+          "arguments": null,
+          "exception": null,
+          "result": null,
+          "items": null,
+          "file_id": null,
+          "vector_store_id": null,
+          "inputs": null,
+          "outputs": null,
+          "image_id": null,
+          "commands": null,
+          "timeout_ms": null,
+          "max_output_length": null,
+          "status": null,
+          "stdout": null,
+          "stderr": null,
+          "exit_code": null,
+          "timed_out": null,
+          "tool_name": null,
+          "server_name": null,
+          "output": null,
+          "id": null,
+          "function_call": null,
+          "user_input_request": null,
+          "approved": null,
+          "consent_link": null
+        }
+      ],
+      "author_name": "Co_ordinator",
+      "message_id": null,
+      "additional_properties": {},
+      "raw_representation": null
+    }
+  ],
+  "response_id": "resp_0ffbc7e873ecdd13006a056119ace48193b46f33bffb5caca6",
+  "agent_id": null,
+  "created_at": "2026-05-14T05:43:54.000000Z",
+  "finish_reason": null,
+  "usage_details": {
+    "input_token_count": 5662,
+    "output_token_count": 1147,
+    "total_token_count": 6809,
+    "openai.reasoning_tokens": 448
+  },
+  "_value": null,
+  "_response_format": null,
+  "_value_parsed": false,
+  "additional_properties": {},
+  "continuation_token": null,
+  "raw_representation": {
+    "messages": [
+      {
+        "role": "assistant",
+        "contents": [
+          {
+            "type": "text_reasoning",
+            "annotations": null,
+            "additional_properties": {},
+            "raw_representation": {
+              "id": "rs_0ffbc7e873ecdd13006a05611a8d788193aaf8b44bbc5351e8",
+              "summary": [],
+              "type": "reasoning",
+              "content": null,
+              "encrypted_content": null,
+              "status": null
+            },
+            "text": "",
+            "protected_data": null,
+            "uri": null,
+            "media_type": null,
+            "message": null,
+            "error_code": null,
+            "error_details": null,
+            "usage_details": null,
+            "call_id": null,
+            "name": null,
+            "arguments": null,
+            "exception": null,
+            "result": null,
+            "items": null,
+            "file_id": null,
+            "vector_store_id": null,
+            "inputs": null,
+            "outputs": null,
+            "image_id": null,
+            "commands": null,
+            "timeout_ms": null,
+            "max_output_length": null,
+            "status": null,
+            "stdout": null,
+            "stderr": null,
+            "exit_code": null,
+            "timed_out": null,
+            "tool_name": null,
+            "server_name": null,
+            "output": null,
+            "id": "rs_0ffbc7e873ecdd13006a05611a8d788193aaf8b44bbc5351e8",
+            "function_call": null,
+            "user_input_request": null,
+            "approved": null,
+            "consent_link": null
+          },
+          {
+            "type": "text",
+            "annotations": null,
+            "additional_properties": {},
+            "raw_representation": {
+              "annotations": [],
+              "text": "Saved-as: .github/workflows/ci.yml\n\n```yaml\nname: CI\n\non:\n  push:\n    branches: [ \"main\" ]\n  pull_request:\n    branches: [ \"main\" ]\n  workflow_dispatch:\n\npermissions:\n  contents: read\n  security-events: write\n\nenv:\n  CI: true\n\njobs:\n  build:\n    name: Build · Test · Lint\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Lint\n        run: npm run lint --if-present\n\n      - name: Run tests\n        run: npm test --if-present --silent\n\n      - name: Build\n        run: npm run build --if-present\n\n  codeql-sast:\n    name: CodeQL SAST Analysis\n    needs: build\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      security-events: write\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Initialize CodeQL\n        uses: github/codeql-action/init@v2\n        with:\n          languages: javascript\n\n      - name: Install dependencies (for CodeQL build)\n        run: npm ci\n\n      - name: Build (for CodeQL)\n        run: npm run build --if-present\n\n      - name: Perform CodeQL analysis\n        uses: github/codeql-action/analyze@v2\n```\n\nNotes / requirements\n- Defaults applied:\n  - Node.js: 18 (single-version matrix). Edit strategy.matrix.node-version to run additional versions.\n  - Package manager: npm (uses npm ci). If you use yarn or pnpm, replace install steps and adjust setup-node caching.\n  - Scripts assumed: lint -> npm run lint, test -> npm test, build -> npm run build. All guarded with --if-present; change if your repository uses different script names.\n- SAST (CodeQL):\n  - CodeQL steps are included (github/codeql-action). The built-in GITHUB_TOKEN is used automatically; no additional secret is required for public repositories.\n  - For private repositories, GitHub Advanced Security may be required to enable full CodeQL features and alerts.\n  - Ensure repository Actions permissions allow security-events: write (the workflow sets this).\n- DAST: No DAST steps included (Enable_DAST = false).\n- Save this file at: .github/workflows/ci.yml\n- If you want caching tuned (e.g., explicit actions/cache for ~/.npm or node_modules), test/coverage artifact upload, test report publishing, or a Node version matrix, tell me and I will update the workflow.",
+              "type": "output_text",
+              "logprobs": []
+            },
+            "text": "Saved-as: .github/workflows/ci.yml\n\n```yaml\nname: CI\n\non:\n  push:\n    branches: [ \"main\" ]\n  pull_request:\n    branches: [ \"main\" ]\n  workflow_dispatch:\n\npermissions:\n  contents: read\n  security-events: write\n\nenv:\n  CI: true\n\njobs:\n  build:\n    name: Build · Test · Lint\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Lint\n        run: npm run lint --if-present\n\n      - name: Run tests\n        run: npm test --if-present --silent\n\n      - name: Build\n        run: npm run build --if-present\n\n  codeql-sast:\n    name: CodeQL SAST Analysis\n    needs: build\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      security-events: write\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Initialize CodeQL\n        uses: github/codeql-action/init@v2\n        with:\n          languages: javascript\n\n      - name: Install dependencies (for CodeQL build)\n        run: npm ci\n\n      - name: Build (for CodeQL)\n        run: npm run build --if-present\n\n      - name: Perform CodeQL analysis\n        uses: github/codeql-action/analyze@v2\n```\n\nNotes / requirements\n- Defaults applied:\n  - Node.js: 18 (single-version matrix). Edit strategy.matrix.node-version to run additional versions.\n  - Package manager: npm (uses npm ci). If you use yarn or pnpm, replace install steps and adjust setup-node caching.\n  - Scripts assumed: lint -> npm run lint, test -> npm test, build -> npm run build. All guarded with --if-present; change if your repository uses different script names.\n- SAST (CodeQL):\n  - CodeQL steps are included (github/codeql-action). The built-in GITHUB_TOKEN is used automatically; no additional secret is required for public repositories.\n  - For private repositories, GitHub Advanced Security may be required to enable full CodeQL features and alerts.\n  - Ensure repository Actions permissions allow security-events: write (the workflow sets this).\n- DAST: No DAST steps included (Enable_DAST = false).\n- Save this file at: .github/workflows/ci.yml\n- If you want caching tuned (e.g., explicit actions/cache for ~/.npm or node_modules), test/coverage artifact upload, test report publishing, or a Node version matrix, tell me and I will update the workflow.",
+            "protected_data": null,
+            "uri": null,
+            "media_type": null,
+            "message": null,
+            "error_code": null,
+            "error_details": null,
+            "usage_details": null,
+            "call_id": null,
+            "name": null,
+            "arguments": null,
+            "exception": null,
+            "result": null,
+            "items": null,
+            "file_id": null,
+            "vector_store_id": null,
+            "inputs": null,
+            "outputs": null,
+            "image_id": null,
+            "commands": null,
+            "timeout_ms": null,
+            "max_output_length": null,
+            "status": null,
+            "stdout": null,
+            "stderr": null,
+            "exit_code": null,
+            "timed_out": null,
+            "tool_name": null,
+            "server_name": null,
+            "output": null,
+            "id": null,
+            "function_call": null,
+            "user_input_request": null,
+            "approved": null,
+            "consent_link": null
+          }
+        ],
+        "author_name": "Co_ordinator",
+        "message_id": null,
+        "additional_properties": {},
+        "raw_representation": null
+      }
+    ],
+    "response_id": "resp_0ffbc7e873ecdd13006a056119ace48193b46f33bffb5caca6",
+    "conversation_id": "resp_0ffbc7e873ecdd13006a056119ace48193b46f33bffb5caca6",
+    "model": "gpt-5-mini",
+    "created_at": "2026-05-14T05:43:54.000000Z",
+    "finish_reason": null,
+    "usage_details": {
+      "input_token_count": 5662,
+      "output_token_count": 1147,
+      "total_token_count": 6809,
+      "openai.reasoning_tokens": 448
+    },
+    "_value": null,
+    "_response_format": null,
+    "_value_parsed": false,
+    "additional_properties": {},
+    "continuation_token": null,
+    "raw_representation": {
+      "id": "resp_0ffbc7e873ecdd13006a056119ace48193b46f33bffb5caca6",
+      "created_at": 1778737434,
+      "error": null,
+      "incomplete_details": null,
+      "instructions": null,
+      "metadata": {},
+      "model": "gpt-5-mini",
+      "object": "response",
+      "output": [
+        {
+          "id": "rs_0ffbc7e873ecdd13006a05611a8d788193aaf8b44bbc5351e8",
+          "summary": [],
+          "type": "reasoning",
+          "content": null,
+          "encrypted_content": null,
+          "status": null
+        },
+        {
+          "id": "msg_0ffbc7e873ecdd13006a05611f45a081938b9ca55f8c32d0af",
+          "content": [
+            {
+              "annotations": [],
+              "text": "Saved-as: .github/workflows/ci.yml\n\n```yaml\nname: CI\n\non:\n  push:\n    branches: [ \"main\" ]\n  pull_request:\n    branches: [ \"main\" ]\n  workflow_dispatch:\n\npermissions:\n  contents: read\n  security-events: write\n\nenv:\n  CI: true\n\njobs:\n  build:\n    name: Build · Test · Lint\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Lint\n        run: npm run lint --if-present\n\n      - name: Run tests\n        run: npm test --if-present --silent\n\n      - name: Build\n        run: npm run build --if-present\n\n  codeql-sast:\n    name: CodeQL SAST Analysis\n    needs: build\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      security-events: write\n    strategy:\n      matrix:\n        node-version: [18]\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v4\n\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: 'npm'\n\n      - name: Initialize CodeQL\n        uses: github/codeql-action/init@v2\n        with:\n          languages: javascript\n\n      - name: Install dependencies (for CodeQL build)\n        run: npm ci\n\n      - name: Build (for CodeQL)\n        run: npm run build --if-present\n\n      - name: Perform CodeQL analysis\n        uses: github/codeql-action/analyze@v2\n```\n\nNotes / requirements\n- Defaults applied:\n  - Node.js: 18 (single-version matrix). Edit strategy.matrix.node-version to run additional versions.\n  - Package manager: npm (uses npm ci). If you use yarn or pnpm, replace install steps and adjust setup-node caching.\n  - Scripts assumed: lint -> npm run lint, test -> npm test, build -> npm run build. All guarded with --if-present; change if your repository uses different script names.\n- SAST (CodeQL):\n  - CodeQL steps are included (github/codeql-action). The built-in GITHUB_TOKEN is used automatically; no additional secret is required for public repositories.\n  - For private repositories, GitHub Advanced Security may be required to enable full CodeQL features and alerts.\n  - Ensure repository Actions permissions allow security-events: write (the workflow sets this).\n- DAST: No DAST steps included (Enable_DAST = false).\n- Save this file at: .github/workflows/ci.yml\n- If you want caching tuned (e.g., explicit actions/cache for ~/.npm or node_modules), test/coverage artifact upload, test report publishing, or a Node version matrix, tell me and I will update the workflow.",
+              "type": "output_text",
+              "logprobs": []
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message",
+          "phase": null
+        }
+      ],
+      "parallel_tool_calls": true,
+      "temperature": 1,
+      "tool_choice": "auto",
+      "tools": [
+        {
+          "name": "Yaml_Agent",
+          "parameters": {
+            "properties": {
+              "prompt": {
+                "description": "Full prompt including original request and any previous context",
+                "title": "Prompt",
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt"
+            ],
+            "title": "Yaml_Agent_input",
+            "type": "object",
+            "additionalProperties": false
+          },
+          "strict": false,
+          "type": "function",
+          "defer_loading": null,
+          "description": null
+        },
+        {
+          "name": "terraform_agent",
+          "parameters": {
+            "properties": {
+              "prompt": {
+                "description": "Full prompt including original request and any previous context",
+                "title": "Prompt",
+                "type": "string"
+              }
+            },
+            "required": [
+              "prompt"
+            ],
+            "title": "terraform_agent_input",
+            "type": "object",
+            "additionalProperties": false
+          },
+          "strict": false,
+          "type": "function",
+          "defer_loading": null,
+          "description": "An agent dedicated to Terraform responsibilities like generating the Terraform modules to provision the infrastructure"
+        }
+      ],
+      "top_p": 1,
+      "background": false,
+      "completed_at": 1778737448,
+      "conversation": null,
+      "max_output_tokens": null,
+      "max_tool_calls": null,
+      "previous_response_id": "resp_0ffbc7e873ecdd13006a04bd349c5481939aaf247ecf521029",
+      "prompt": null,
+      "prompt_cache_key": null,
+      "prompt_cache_retention": "in_memory",
+      "reasoning": {
+        "effort": "medium",
+        "generate_summary": null,
+        "summary": null
+      },
+      "safety_identifier": null,
+      "service_tier": "default",
+      "status": "completed",
+      "text": {
+        "format": {
+          "type": "text"
+        },
+        "verbosity": "medium"
+      },
+      "top_logprobs": 0,
+      "truncation": "disabled",
+      "usage": {
+        "input_tokens": 5662,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens": 1147,
+        "output_tokens_details": {
+          "reasoning_tokens": 448
+        },
+        "total_tokens": 6809
+      },
+      "user": null,
+      "content_filters": [
+        {
+          "blocked": false,
+          "source_type": "prompt",
+          "content_filter_raw": [],
+          "content_filter_results": {
+            "jailbreak": {
+              "detected": false,
+              "filtered": false
+            },
+            "hate": {
+              "filtered": false,
+              "severity": "safe"
+            },
+            "sexual": {
+              "filtered": false,
+              "severity": "safe"
+            },
+            "violence": {
+              "filtered": false,
+              "severity": "safe"
+            },
+            "self_harm": {
+              "filtered": false,
+              "severity": "safe"
+            }
+          },
+          "content_filter_offsets": {
+            "start_offset": 0,
+            "end_offset": 17619,
+            "check_offset": 0
+          }
+        },
+        {
+          "blocked": false,
+          "source_type": "completion",
+          "content_filter_raw": [],
+          "content_filter_results": {
+            "protected_material_code": {
+              "detected": false,
+              "filtered": false
+            },
+            "protected_material_text": {
+              "detected": false,
+              "filtered": false
+            },
+            "hate": {
+              "filtered": false,
+              "severity": "safe"
+            },
+            "sexual": {
+              "filtered": false,
+              "severity": "safe"
+            },
+            "violence": {
+              "filtered": false,
+              "severity": "safe"
+            },
+            "self_harm": {
+              "filtered": false,
+              "severity": "safe"
+            }
+          },
+          "content_filter_offsets": {
+            "start_offset": 0,
+            "end_offset": 6436,
+            "check_offset": 0
+          }
+        }
+      ],
+      "frequency_penalty": 0,
+      "presence_penalty": 0,
+      "store": true
+    }
+  }
+}

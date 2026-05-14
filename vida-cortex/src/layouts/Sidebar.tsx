@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box, List, ListItemButton, ListItemIcon, ListItemText,
@@ -7,7 +7,7 @@ import {
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SettingsIcon from '@mui/icons-material/Settings';
-
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import MenuIcon from '@mui/icons-material/Menu';
@@ -15,17 +15,17 @@ import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 import { neuShadowSm } from '../data/theme';
 import { useThemeMode } from '../hooks/useThemeMode';
+import { ROUTE_PATHS } from '../routes';
 
-const navItems = [
-  { label: 'Dashboard',        icon: DashboardIcon,        path: '/dashboard' },
-  { label: 'Approvals',        icon: CheckCircleIcon,      path: '/approvals' },
-  { label: 'Agent Builder',    icon: SettingsIcon,         path: '/agent-builder' },
-  { label: 'Workflows',        icon: AccountTreeIcon,      path: '/workflows' },
-  // { label: 'Repositories',     icon: FolderIcon,           path: '/repos' },
-  // { label: 'Onboarding',       icon: AddCircleOutlineIcon, path: '/onboarding' },
-  // { label: 'Deployments',      icon: RocketLaunchIcon,     path: '/deployments' },
-  // { label: 'Builds',           icon: BuildIcon,            path: '/builds' },
-  // { label: 'Failed Pipelines', icon: ErrorIcon,            path: '/failed-pipelines' },
+const baseNavItems = [
+  { label: 'Dashboard',        icon: DashboardIcon,        path: ROUTE_PATHS.DASHBOARD },
+  { label: 'Approvals',        icon: CheckCircleIcon,      path: ROUTE_PATHS.APPROVALS },
+  { label: 'Agent Builder',    icon: SettingsIcon,         path: ROUTE_PATHS.AGENT_BUILDER },
+  { label: 'Workflows',        icon: AccountTreeIcon,      path: ROUTE_PATHS.WORKFLOWS },
+];
+
+const adminNavItems = [
+  { label: 'Agent Onboarding', icon: SmartToyIcon,         path: ROUTE_PATHS.AGENT_ONBOARDING },
 ];
 
 export const SIDEBAR_W = 220;
@@ -35,16 +35,24 @@ interface Props { onWidthChange?: (w: number) => void }
 
 export default function Sidebar({ onWidthChange }: Props) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { isDark } = useThemeMode();
 
-  const bg       = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.55)';
-  const border   = isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.7)';
-  const textPri  = isDark ? '#F9FAFB' : '#111827';
+  useEffect(() => {
+    const userRole = localStorage.getItem('userRole');
+    setIsAdmin(userRole === 'admin');
+  }, [pathname]);
+
+  const navItems = isAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
+
+  const bg       = isDark ? 'rgba(10,14,26,0.95)' : 'rgba(255,255,255,0.55)';
+  const border   = isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.7)';
+  const textPri  = isDark ? '#F3F4F6' : '#111827';
   const textSec  = isDark ? '#9CA3AF' : '#374151';
-  const iconSec  = isDark ? '#6B7280' : '#6B7280';
-  const btnBg    = isDark ? 'rgba(255,255,255,0.06)' : '#F3F4F6';
+  const iconSec  = isDark ? '#9CA3AF' : '#6B7280';
+  const btnBg    = isDark ? 'rgba(255,255,255,0.08)' : '#F3F4F6';
 
   const toggle = () => {
     const next = !collapsed;
@@ -71,7 +79,9 @@ export default function Sidebar({ onWidthChange }: Props) {
         top: 0, left: 0, bottom: 0,
         zIndex: 1200,
         overflow: 'hidden',
-        boxShadow: '4px 0 20px rgba(0,0,0,0.06)',
+        boxShadow: isDark 
+          ? '4px 0 24px rgba(0,0,0,0.4)' 
+          : '4px 0 20px rgba(0,0,0,0.06)',
       }}
     >
       {/* Logo */}
@@ -120,11 +130,18 @@ export default function Sidebar({ onWidthChange }: Props) {
                   borderRadius: 2,
                   mb: 0.5,
                   px: collapsed ? 1.5 : 1.5,
-                  bgcolor: active ? 'rgba(13,148,136,0.08)' : 'transparent',
+                  bgcolor: active 
+                    ? (isDark ? 'rgba(13,148,136,0.15)' : 'rgba(13,148,136,0.08)') 
+                    : 'transparent',
                   boxShadow: active ? neuShadowSm : 'none',
                   borderLeft: active ? '3px solid #0D9488' : '3px solid transparent',
                   transition: 'all 0.2s ease',
-                  '&:hover': { bgcolor: 'rgba(13,148,136,0.05)', transform: 'translateX(2px)' },
+                  '&:hover': { 
+                    bgcolor: isDark 
+                      ? 'rgba(13,148,136,0.1)' 
+                      : 'rgba(13,148,136,0.05)', 
+                    transform: 'translateX(2px)' 
+                  },
                   justifyContent: collapsed ? 'center' : 'flex-start',
                 }}
               >

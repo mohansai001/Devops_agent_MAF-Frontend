@@ -1,0 +1,266 @@
+# 🔐 Admin Login Flow Diagram
+
+## Login Flow
+
+```
+                         ┌─────────────────┐
+                         │  /login page    │
+                         └────────┬────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │                           │
+            ┌───────▼────────┐         ┌───────▼────────┐
+            │  User Login    │         │  Admin Login   │
+            │  (GitHub)      │         │  (Form)        │
+            └───────┬────────┘         └───────┬────────┘
+                    │                           │
+                    │                           │
+         ┌──────────▼──────────┐    ┌──────────▼──────────┐
+         │ Set role = 'user'   │    │ Validate:           │
+         │ isAuth = true       │    │ user = 'admin'      │
+         └──────────┬──────────┘    │ pass = 'admin'      │
+                    │                └──────────┬──────────┘
+                    │                           │
+                    │                  ┌────────▼────────┐
+                    │                  │ Set role = 'admin'│
+                    │                  │ isAuth = true     │
+                    │                  └────────┬──────────┘
+                    │                           │
+         ┌──────────▼──────────┐    ┌──────────▼──────────┐
+         │  Navigate to:       │    │  Navigate to:       │
+         │  /dashboard         │    │  /agent-onboarding  │
+         └─────────────────────┘    └─────────────────────┘
+```
+
+## Sidebar Menu Logic
+
+```
+┌──────────────────────────────────────────┐
+│  Sidebar Component                       │
+└──────────┬───────────────────────────────┘
+           │
+           ▼
+   ┌───────────────────┐
+   │ Get user role     │
+   │ from localStorage │
+   └───────┬───────────┘
+           │
+    ┌──────▼───────┐
+    │ role check   │
+    └──┬───────┬───┘
+       │       │
+   ┌───▼──┐ ┌─▼────┐
+   │'user'│ │'admin'│
+   └───┬──┘ └─┬────┘
+       │      │
+       │      └──────────────┐
+       │                     │
+       ▼                     ▼
+   ┌─────────────┐      ┌────────────────┐
+   │ Show:       │      │ Show:          │
+   │ • Dashboard │      │ • Dashboard    │
+   │ • Approvals │      │ • Approvals    │
+   │ • Builder   │      │ • Builder      │
+   │ • Workflows │      │ • Workflows    │
+   └─────────────┘      │ • Agent Onboard│
+                        └────────────────┘
+```
+
+## Agent Onboarding CRUD Flow
+
+```
+┌────────────────────────────────────────────────┐
+│         Agent Onboarding Page                  │
+│  (/agent-onboarding)                           │
+└──────────┬─────────────────────────────────────┘
+           │
+     ┌─────▼─────┐
+     │  Actions  │
+     └─────┬─────┘
+           │
+    ┌──────┴──────┬──────────┬─────────┬─────────┐
+    │             │          │         │         │
+┌───▼────┐  ┌────▼───┐  ┌──▼───┐  ┌──▼───┐  ┌─▼────┐
+│ Create │  │ Read   │  │Update│  │Delete│  │Activate│
+└───┬────┘  └────┬───┘  └──┬───┘  └──┬───┘  └─┬────┘
+    │            │         │         │        │
+    ▼            ▼         ▼         ▼        ▼
+┌────────┐  ┌────────┐  ┌─────┐  ┌──────┐  ┌──────┐
+│[+ Btn] │  │ Table  │  │[Edit]│  │[Del] │  │[Act] │
+│ Dialog │  │Display │  │Dialog│  │Remove│  │Status│
+│ Form   │  │ Agents │  │ Form │  │Agent │  │→     │
+│ Fill   │  │        │  │Update│  │      │  │Active│
+│ Save   │  │        │  │ Save │  │      │  │      │
+└───┬────┘  └────────┘  └──┬───┘  └──┬───┘  └──┬───┘
+    │                      │         │        │
+    └──────────┬───────────┴─────────┴────────┘
+               │
+               ▼
+       ┌───────────────┐
+       │ Update State  │
+       │ Show Snackbar │
+       └───────────────┘
+```
+
+## Data Flow
+
+```
+┌─────────────────────────────────────────────────┐
+│               Login Form                        │
+│  username: admin, password: admin               │
+└──────────────────┬──────────────────────────────┘
+                   │
+                   ▼
+        ┌──────────────────────┐
+        │ handleAdminLogin()   │
+        │ Validate credentials │
+        └──────────┬───────────┘
+                   │
+         ┌─────────▼─────────┐
+         │ localStorage:     │
+         │ • userRole='admin'│
+         │ • isAuth='true'   │
+         └─────────┬─────────┘
+                   │
+                   ▼
+        ┌──────────────────────┐
+        │ Navigate to:         │
+        │ /agent-onboarding    │
+        └──────────┬───────────┘
+                   │
+                   ▼
+        ┌──────────────────────┐
+        │ AppLayout renders    │
+        │ • Header             │
+        │ • Sidebar (w/ admin) │
+        │ • AgentOnboarding    │
+        └──────────────────────┘
+```
+
+## Component Hierarchy
+
+```
+App.tsx
+└── ThemedApp
+    └── BrowserRouter
+        └── Routes
+            ├── /login
+            │   └── Login
+            │       ├── User Tab (GitHub OAuth)
+            │       └── Admin Tab (Form)
+            │
+            ├── /dashboard
+            │   └── AppLayout
+            │       ├── Header
+            │       ├── Sidebar (user menu)
+            │       └── Dashboard
+            │
+            └── /agent-onboarding
+                └── AppLayout
+                    ├── Header
+                    ├── Sidebar (admin menu)
+                    └── AgentOnboarding
+                        ├── Table (agents list)
+                        ├── Dialog (add/edit)
+                        └── Snackbar (notifications)
+```
+
+## State Management
+
+```
+┌─────────────────────────────────────────────┐
+│           AgentOnboarding.tsx               │
+├─────────────────────────────────────────────┤
+│                                             │
+│  State:                                     │
+│  ┌──────────────────────────────────────┐  │
+│  │ agents: Agent[]                      │  │
+│  │ open: boolean                        │  │
+│  │ editingAgent: Agent | null           │  │
+│  │ snack: string                        │  │
+│  │ agentName: string                    │  │
+│  │ agentType: string                    │  │
+│  │ agentCapabilities: string            │  │
+│  └──────────────────────────────────────┘  │
+│                                             │
+│  Actions:                                   │
+│  ┌──────────────────────────────────────┐  │
+│  │ handleOpenDialog()                   │  │
+│  │ handleClose()                        │  │
+│  │ handleSaveAgent()                    │  │
+│  │ handleDeleteAgent()                  │  │
+│  │ handleActivateAgent()                │  │
+│  │ getStatusColor()                     │  │
+│  │ getStatusIcon()                      │  │
+│  └──────────────────────────────────────┘  │
+└─────────────────────────────────────────────┘
+```
+
+## Agent Data Model
+
+```typescript
+interface Agent {
+  id: string; // Unique identifier
+  name: string; // "Build Agent Alpha"
+  type: string; // "Build", "Deployment", "Testing"
+  capabilities: string[]; // ["Docker", "Node.js", "Python"]
+  status: "active" | "inactive" | "pending";
+  registeredDate: string; // "2026-05-12"
+}
+```
+
+## Authentication Flow
+
+```
+┌────────────────────────────────────────────┐
+│  Browser localStorage                      │
+├────────────────────────────────────────────┤
+│                                            │
+│  Key: 'userRole'                           │
+│  Value: 'user' | 'admin'                   │
+│                                            │
+│  Key: 'isAuthenticated'                    │
+│  Value: 'true' | 'false'                   │
+│                                            │
+└──────────────┬─────────────────────────────┘
+               │
+               │ Read on component mount
+               ▼
+    ┌──────────────────────┐
+    │  Sidebar.tsx         │
+    │  useEffect(() => {   │
+    │    const role =      │
+    │    localStorage      │
+    │    .getItem('role')  │
+    │    setIsAdmin(       │
+    │      role === 'admin'│
+    │    )                 │
+    │  }, [pathname])      │
+    └──────────────────────┘
+```
+
+## Security Considerations
+
+```
+Current (Development):
+┌─────────────────────────────────┐
+│ Frontend Only                   │
+│ • Hardcoded credentials         │
+│ • localStorage for session      │
+│ • No encryption                 │
+│ • Client-side validation only   │
+└─────────────────────────────────┘
+
+Production (Recommended):
+┌─────────────────────────────────┐
+│ Full Stack                      │
+│ • Backend API authentication    │
+│ • JWT tokens                    │
+│ • Password hashing (bcrypt)     │
+│ • HTTPS/TLS                     │
+│ • Server-side validation        │
+│ • Rate limiting                 │
+│ • 2FA for admin                 │
+│ • Audit logging                 │
+└─────────────────────────────────┘
+```

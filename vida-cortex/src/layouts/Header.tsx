@@ -32,7 +32,7 @@ export default function Header({ title, sidebarWidth }: Props) {
     >
       <Toolbar sx={{ minHeight: 52 }}>
         <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" fontWeight={700} sx={{ color: '#111827', letterSpacing: '-0.01em', fontSize: '0.85rem' }}>
+          <Typography variant="h6" fontWeight={700} sx={{ color: isDark ? '#F3F4F6' : '#111827', letterSpacing: '-0.01em', fontSize: '0.85rem' }}>
             {title}
           </Typography>
           <Chip
@@ -40,12 +40,14 @@ export default function Header({ title, sidebarWidth }: Props) {
             label="Agent Active"
             size="small"
             sx={{
-              bgcolor: 'rgba(13,148,136,0.08)',
+              bgcolor: isDark ? 'rgba(13,148,136,0.15)' : 'rgba(13,148,136,0.08)',
               color: '#0D9488',
               fontWeight: 600,
               fontSize: 11,
               border: 'none',
-              boxShadow: '3px 3px 8px rgba(0,0,0,0.07), -3px -3px 8px rgba(255,255,255,0.7)',
+              boxShadow: isDark 
+                ? '3px 3px 10px rgba(0,0,0,0.3), -2px -2px 8px rgba(255,255,255,0.03)' 
+                : '3px 3px 8px rgba(0,0,0,0.07), -3px -3px 8px rgba(255,255,255,0.7)',
             }}
           />
         </Box>

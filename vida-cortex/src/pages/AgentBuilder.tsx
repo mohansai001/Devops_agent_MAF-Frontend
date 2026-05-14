@@ -320,6 +320,18 @@ export default function AgentBuilder() {
 
   const saveAgentPrompt = (prompt: string) => {
     if (promptDialog.agent) {
+      console.log('--------------------------------------------');
+      console.log('💬 SAVING AGENT PROMPT');
+      console.log('--------------------------------------------');
+      console.log('Agent:', promptDialog.agent.label);
+      console.log('Agent ID:', promptDialog.agent.id);
+      if (prompt && prompt.trim()) {
+        console.log('✅ Custom Prompt:', prompt);
+      } else {
+        console.log('⚠️  Prompt cleared (will use default task)');
+      }
+      console.log('--------------------------------------------\n');
+
       setSelectedAgents(prev => 
         prev.map(agent => 
           agent.id === promptDialog.agent!.id 
@@ -337,7 +349,9 @@ export default function AgentBuilder() {
 
   const handleSaveWorkflow = () => {
     if (!workflowName.trim()) return;
-    saveWorkflow({
+    
+    // Prepare workflow data with agent prompts
+    const workflowData = {
       name: workflowName,
       agents: selectedAgents.map(a => ({
         id: a.id,
@@ -347,7 +361,37 @@ export default function AgentBuilder() {
         prompt: a.prompt,
         success: a.success,
       })),
+    };
+
+    // 🔍 Print workflow details to console
+    console.log('============================================');
+    console.log('📝 SAVING WORKFLOW');
+    console.log('============================================');
+    console.log('Workflow Name:', workflowName);
+    console.log('Total Agents:', selectedAgents.length);
+    console.log('--------------------------------------------');
+    
+    // Print each agent with its prompt
+    selectedAgents.forEach((agent, index) => {
+      console.log(`\n🤖 Agent ${index + 1}: ${agent.label}`);
+      console.log(`   ID: ${agent.id}`);
+      console.log(`   Color: ${agent.color}`);
+      console.log(`   Default Task: ${agent.task}`);
+      if (agent.prompt && agent.prompt.trim()) {
+        console.log(`   ✅ Custom Prompt: "${agent.prompt}"`);
+      } else {
+        console.log(`   ⚠️  No custom prompt (using default task)`);
+      }
     });
+    
+    console.log('\n============================================');
+    console.log('📦 Complete Workflow Data:');
+    console.log(JSON.stringify(workflowData, null, 2));
+    console.log('============================================\n');
+
+    // Save the workflow
+    saveWorkflow(workflowData);
+    
     setSaveDialog(false);
     setWorkflowName('');
     navigate('/workflows');
