@@ -211,15 +211,58 @@ function GeneratedContentDisplay({ recordId, apiData }: {
       console.log(`Extracting content from API data for record ID: ${recordId}`);
       console.log('Data structure:', data);
       console.log('Data type:', typeof data);
+      console.log('Data keys:', data ? Object.keys(data) : 'no data');
       console.log('Output array:', data?.output);
       
       let finalContent = '';
+      let detailsContent = ''; // Store Details separately
       
-      // ✅ NEW: Check if data is already a plain string (YAML content directly)
+      // ✅ Check if data is already a plain string (YAML content directly)
       if (typeof data === 'string') {
         console.log('✓ Data is a plain string - using it directly');
         finalContent = data;
-      } else {
+      } 
+      // ✅ NEW: Check if data is an object with "TASK COMPLETED" and "Details" properties
+      else if (data && typeof data === 'object') {
+        console.log('✓ Checking object properties...');
+        
+        // Extract Details field - check if it's an object with deployment_url
+        if (data['Details']) {
+          if (typeof data['Details'] === 'object' && data['Details'].deployment_url) {
+            console.log('✓ Found Details object with deployment_url:', data['Details'].deployment_url);
+            detailsContent = data['Details'].deployment_url;
+          } else if (typeof data['Details'] === 'string') {
+            console.log('✓ Found Details field as string:', data['Details']);
+            detailsContent = data['Details'];
+          }
+        }
+        
+        // Extract TASK COMPLETED field (contains YAML)
+        if (data['TASK COMPLETED'] && Array.isArray(data['TASK COMPLETED'])) {
+          console.log('✓ Found TASK COMPLETED array:', data['TASK COMPLETED']);
+          finalContent = data['TASK COMPLETED'].join('\n\n');
+        }
+        // Or check if data has any property that's an array with string content
+        else {
+          for (const key in data) {
+            if (Array.isArray(data[key]) && data[key].length > 0 && typeof data[key][0] === 'string') {
+              console.log(`✓ Found content in property "${key}":`, data[key]);
+              finalContent = data[key].join('\n\n');
+              break;
+            }
+          }
+        }
+        
+        // Combine Details and content if both exist
+        if (detailsContent && finalContent) {
+          finalContent = `${detailsContent}\n\n${'='.repeat(80)}\n\n${finalContent}`;
+        } else if (detailsContent && !finalContent) {
+          finalContent = detailsContent;
+        }
+      }
+      
+      // If still no content, try the old structured format
+      if (!finalContent) {
         const contentTexts: string[] = [];
         
         // Extract from output array
@@ -289,7 +332,9 @@ function GeneratedContentDisplay({ recordId, apiData }: {
         }
         
         console.log(`Total texts extracted: ${contentTexts.length}`);
-        finalContent = contentTexts.join('\n\n');
+        if (contentTexts.length > 0) {
+          finalContent = contentTexts.join('\n\n');
+        }
       }
       
       console.log('Final content length:', finalContent.length);
@@ -604,6 +649,9 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
   const logBufferRef = useRef<Array<{ agentIndex: number; message: string }>>([]);
   const isPlayingLogsRef = useRef(false);
   
+  // ✅ Track if we've received generated output from API
+  const hasGeneratedOutputRef = useRef(false);
+  
   // Keep agentsRef in sync with AGENTS
   useEffect(() => {
     agentsRef.current = AGENTS;
@@ -637,16 +685,34 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
     
     let currentIndex = 0;
     const LOG_DELAY = 800; // milliseconds between each log (increased for slower playback)
+    let currentWorkingAgent: number | null = null; // Track which agent is currently working
+    const agentsWithLogs = new Set<number>(); // Track which agents have received logs
     
     const playNextLog = () => {
       if (currentIndex >= logBufferRef.current.length) {
         console.log('✅ Finished playing all buffered logs');
         isPlayingLogsRef.current = false;
         logBufferRef.current = []; // Clear buffer
+        
+        // ✅ Check if we already have generated output
+        if (hasGeneratedOutputRef.current) {
+          console.log('✅ Generated output already received - marking all agents as done NOW');
+          setAgentStates(prev => prev.map((_state, idx) => ({
+            phase: 'done' as AgentPhase,
+            returnMsg: `${agentsRef.current[idx]?.label || 'Agent'} completed successfully`
+          })));
+          setDone(true);
+          setOrchMsg('✓ All agents complete — pipeline successful!');
+          onExecutionComplete?.(true);
+        } else {
+          console.log('⏸️ Logs playback complete. Waiting for generated output to mark agents as done...');
+        }
+        
         return;
       }
       
       const { agentIndex, message } = logBufferRef.current[currentIndex];
+      agentsWithLogs.add(agentIndex); // Track this agent
       console.log(`📤 Displaying log ${currentIndex + 1}/${logBufferRef.current.length} for agent ${agentIndex}`);
       
       // Add log to UI
@@ -661,31 +727,30 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
         };
       });
       
-      // Update agent status based on log message
+      // ✅ Sequential execution: Only set ONE agent to 'working' at a time
       const agentName = agentsRef.current[agentIndex]?.label || '';
-      if (message.includes('Called with prompt') || message.includes('Tool called') || message.includes('called with')) {
+      
+      // Check if this is the first log for this agent
+      if (currentWorkingAgent !== agentIndex) {
+        console.log(`🔄 Agent ${agentIndex} (${agentName}) starting work`);
+        
+        // Reset previous agent to idle if needed
+        if (currentWorkingAgent !== null && currentWorkingAgent !== agentIndex) {
+          setPhase(currentWorkingAgent, 'idle');
+        }
+        
+        // Set new agent to working
         setPhase(agentIndex, 'working');
         setOrchMsg(`${agentName} is processing...`);
-      } else if (message.includes('Successfully generated') || message.includes('completed') || message.includes('success')) {
-        setPhase(agentIndex, 'done', `${agentName} completed successfully`);
-        setOrchMsg(`✓ ${agentName} complete`);
-        
-        // Check if all agents are done
-        setTimeout(() => {
-          setAgentStates(currentStates => {
-            const allDone = currentStates.every(s => s.phase === 'done' || s.phase === 'failed');
-            if (allDone) {
-              console.log('✅ All agents completed - execution finished');
-              setDone(true);
-              onExecutionComplete?.(true);
-            }
-            return currentStates;
-          });
-        }, 100);
-      } else if (message.includes('Error') || message.includes('Failed') || message.includes('failed')) {
+        currentWorkingAgent = agentIndex;
+      }
+      
+      // Check for error in log
+      if (message.includes('Error') || message.includes('Failed') || message.includes('failed')) {
         setPhase(agentIndex, 'failed');
         setOrchMsg(`✗ ${agentName} failed`);
       }
+      // ✅ DON'T set to 'done' here - wait until ALL logs are played
       
       currentIndex++;
       setTimeout(playNextLog, LOG_DELAY);
@@ -774,6 +839,18 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
           }
           
           setOrchMsg('Pipeline triggered — waiting for agents...');
+          
+          // ✅ Check if we have generated output (TASK COMPLETED or plain string)
+          // Just set a flag - don't mark agents as done yet (wait for logs to finish)
+          const hasGeneratedOutput = 
+            (typeof data === 'string' && data.length > 0) ||
+            (data && data['TASK COMPLETED'] && Array.isArray(data['TASK COMPLETED']) && data['TASK COMPLETED'].length > 0);
+          
+          if (hasGeneratedOutput) {
+            console.log('✅ Generated output received from API - setting flag');
+            hasGeneratedOutputRef.current = true;
+            // Don't mark agents as done here - let the log playback completion handle it
+          }
           
           // Notify parent with API data for content display
           onApiDataReceived?.(data);
