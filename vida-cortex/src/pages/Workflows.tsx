@@ -40,6 +40,25 @@ export default function Workflows() {
     try {
       const response = await fetch('http://127.0.0.1:8000/sql/sql/get_all_triggered_records');
       const data = await response.json();
+      console.log('📡 Fetched repositories from API:', data);
+      console.log('📋 Repository IDs:', data.map((r: any) => ({ repo: r.repo, id: r.id })));
+      
+      // 🔍 Check for duplicate IDs
+      const ids = data.map((r: any) => r.id);
+      const uniqueIds = new Set(ids);
+      if (ids.length !== uniqueIds.size) {
+        console.warn('⚠️⚠️⚠️ WARNING: DUPLICATE IDs DETECTED! ⚠️⚠️⚠️');
+        console.warn('All repositories have the same ID. This is a BACKEND DATABASE ISSUE.');
+        console.warn('Total repositories:', ids.length);
+        console.warn('Unique IDs:', uniqueIds.size);
+        console.warn('The ID value is:', Array.from(uniqueIds)[0]);
+        console.warn('Expected: Each repository should have a unique ID (1, 2, 3, 4, ...)');
+        console.warn('Actual: All repositories have ID:', Array.from(uniqueIds)[0]);
+        console.warn('\n🛠️ BACKEND FIX NEEDED:');
+        console.warn('Check your database query in get_all_triggered_records endpoint');
+        console.warn('Make sure it returns the correct unique ID for each record.');
+      }
+      
       setRepositories(data);
     } catch (error) {
       console.error('Failed to fetch repositories:', error);
@@ -59,9 +78,15 @@ export default function Workflows() {
 
   const handleConfirmExecute = async () => {
     if (executeDialog.workflow && selectedRepo) {
-      const selectedRecord = repositories.find(r => r.repo === selectedRepo);
+      // selectedRepo now contains the record ID (as string)
+      const selectedRecord = repositories.find(r => r.id.toString() === selectedRepo);
       if (selectedRecord) {
-        startWorkflowExecution(executeDialog.workflow.id, selectedRepo, selectedRecord.id);
+        console.log('🚀 Executing workflow:', executeDialog.workflow.name);
+        console.log('📦 Selected repository:', selectedRecord.repo);
+        console.log('🔢 Record ID from API:', selectedRecord.id);
+        console.log('➡️ Will call: http://127.0.0.1:8000/agents/agent/' + selectedRecord.id);
+        
+        startWorkflowExecution(executeDialog.workflow.id, selectedRecord.repo, selectedRecord.id);
         setExecuteDialog({ open: false, workflow: null });
         navigate('/approvals');
       }
@@ -147,14 +172,29 @@ export default function Workflows() {
           <TextField
             select
             fullWidth
-            label="Select Repository"
+            label="Select Repository Record"
             value={selectedRepo}
-            onChange={(e) => setSelectedRepo(e.target.value)}
+            onChange={(e) => {
+              const recordId = e.target.value;
+              setSelectedRepo(recordId);
+              
+              // 🔍 Log selected repository details
+              const selectedRecord = repositories.find(r => r.id.toString() === recordId);
+              if (selectedRecord) {
+                console.log('============================================');
+                console.log('📦 REPOSITORY SELECTED');
+                console.log('============================================');
+                console.log('Repository Name:', selectedRecord.repo);
+                console.log('Record ID:', selectedRecord.id);
+                console.log('Full Record:', selectedRecord);
+                console.log('============================================\n');
+              }
+            }}
             className="repo-select"
           >
             {repositories.map((record) => (
-              <MenuItem key={record.id} value={record.repo}>
-                {record.repo}
+              <MenuItem key={record.id} value={record.id.toString()}>
+                ID: {record.id} - {record.repo}
               </MenuItem>
             ))}
           </TextField>

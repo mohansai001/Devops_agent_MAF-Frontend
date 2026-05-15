@@ -149,20 +149,12 @@ function StageStepper({ stageLogs }: { stageLogs: StageLog[] }) {
 }
 
 // Generated Content Display
-function GeneratedContentDisplay({ recordId, apiData, isExecutionComplete }: { 
+function GeneratedContentDisplay({ recordId, apiData }: { 
   recordId: number; 
   apiData?: any;
-  isExecutionComplete?: boolean;
 }) {
-  const [content, setContent] = useState<string>(() => {
-    // Initialize from session storage
-    try {
-      const stored = sessionStorage.getItem(`generatedContent_${recordId}`);
-      return stored || '';
-    } catch {
-      return '';
-    }
-  });
+  // Don't persist to sessionStorage - start fresh on page refresh
+  const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [linksExpanded, setLinksExpanded] = useState(false);
@@ -218,78 +210,88 @@ function GeneratedContentDisplay({ recordId, apiData, isExecutionComplete }: {
     try {
       console.log(`Extracting content from API data for record ID: ${recordId}`);
       console.log('Data structure:', data);
+      console.log('Data type:', typeof data);
       console.log('Output array:', data?.output);
       
-      const contentTexts: string[] = [];
+      let finalContent = '';
       
-      // Extract from output array
-      if (data?.output && Array.isArray(data.output)) {
-        console.log(`Processing ${data.output.length} output items`);
-        data.output.forEach((item: any, idx: number) => {
-          console.log(`Output item ${idx}:`, item);
-          console.log(`  Type: ${item?.type}`);
-          
-          // Skip reasoning items
-          if (item?.type === 'reasoning') {
-            console.log(`  Skipping reasoning item`);
-            return;
-          }
-          
-          // Check for content array in output items
-          if (item?.content && Array.isArray(item.content)) {
-            console.log(`  Found content array with ${item.content.length} items`);
-            item.content.forEach((contentItem: any, contentIdx: number) => {
-              console.log(`    Content item ${contentIdx}:`, contentItem);
-              console.log(`    Type: ${contentItem?.type}`);
-              
-              if (contentItem?.type === 'output_text' && contentItem?.text) {
-                console.log(`    ✓ Extracted text (${contentItem.text.length} chars)`);
-                contentTexts.push(contentItem.text);
-              }
-            });
-          }
-        });
+      // ✅ NEW: Check if data is already a plain string (YAML content directly)
+      if (typeof data === 'string') {
+        console.log('✓ Data is a plain string - using it directly');
+        finalContent = data;
+      } else {
+        const contentTexts: string[] = [];
+        
+        // Extract from output array
+        if (data?.output && Array.isArray(data.output)) {
+          console.log(`Processing ${data.output.length} output items`);
+          data.output.forEach((item: any, idx: number) => {
+            console.log(`Output item ${idx}:`, item);
+            console.log(`  Type: ${item?.type}`);
+            
+            // Skip reasoning items
+            if (item?.type === 'reasoning') {
+              console.log(`  Skipping reasoning item`);
+              return;
+            }
+            
+            // Check for content array in output items
+            if (item?.content && Array.isArray(item.content)) {
+              console.log(`  Found content array with ${item.content.length} items`);
+              item.content.forEach((contentItem: any, contentIdx: number) => {
+                console.log(`    Content item ${contentIdx}:`, contentItem);
+                console.log(`    Type: ${contentItem?.type}`);
+                
+                if (contentItem?.type === 'output_text' && contentItem?.text) {
+                  console.log(`    ✓ Extracted text (${contentItem.text.length} chars)`);
+                  contentTexts.push(contentItem.text);
+                }
+              });
+            }
+          });
+        }
+        
+        // Also check raw_representation.output if main output is empty
+        if (contentTexts.length === 0 && data?.raw_representation?.output && Array.isArray(data.raw_representation.output)) {
+          console.log('Checking raw_representation.output');
+          data.raw_representation.output.forEach((item: any) => {
+            if (item?.type === 'reasoning') return;
+            
+            if (item?.content && Array.isArray(item.content)) {
+              item.content.forEach((contentItem: any) => {
+                if (contentItem?.type === 'output_text' && contentItem?.text) {
+                  console.log(`✓ Extracted from raw_representation (${contentItem.text.length} chars)`);
+                  contentTexts.push(contentItem.text);
+                }
+              });
+            }
+          });
+        }
+        
+        // Check deeper nested structure: raw_representation.raw_representation.output
+        if (contentTexts.length === 0 && data?.raw_representation?.raw_representation?.output && Array.isArray(data.raw_representation.raw_representation.output)) {
+          console.log('Checking raw_representation.raw_representation.output (nested deeper)');
+          data.raw_representation.raw_representation.output.forEach((item: any) => {
+            if (item?.type === 'reasoning') {
+              console.log('  Skipping reasoning item in nested structure');
+              return;
+            }
+            
+            if (item?.content && Array.isArray(item.content)) {
+              item.content.forEach((contentItem: any) => {
+                if (contentItem?.type === 'output_text' && contentItem?.text) {
+                  console.log(`✓ Extracted from raw_representation.raw_representation (${contentItem.text.length} chars)`);
+                  contentTexts.push(contentItem.text);
+                }
+              });
+            }
+          });
+        }
+        
+        console.log(`Total texts extracted: ${contentTexts.length}`);
+        finalContent = contentTexts.join('\n\n');
       }
       
-      // Also check raw_representation.output if main output is empty
-      if (contentTexts.length === 0 && data?.raw_representation?.output && Array.isArray(data.raw_representation.output)) {
-        console.log('Checking raw_representation.output');
-        data.raw_representation.output.forEach((item: any) => {
-          if (item?.type === 'reasoning') return;
-          
-          if (item?.content && Array.isArray(item.content)) {
-            item.content.forEach((contentItem: any) => {
-              if (contentItem?.type === 'output_text' && contentItem?.text) {
-                console.log(`✓ Extracted from raw_representation (${contentItem.text.length} chars)`);
-                contentTexts.push(contentItem.text);
-              }
-            });
-          }
-        });
-      }
-      
-      // Check deeper nested structure: raw_representation.raw_representation.output
-      if (contentTexts.length === 0 && data?.raw_representation?.raw_representation?.output && Array.isArray(data.raw_representation.raw_representation.output)) {
-        console.log('Checking raw_representation.raw_representation.output (nested deeper)');
-        data.raw_representation.raw_representation.output.forEach((item: any) => {
-          if (item?.type === 'reasoning') {
-            console.log('  Skipping reasoning item in nested structure');
-            return;
-          }
-          
-          if (item?.content && Array.isArray(item.content)) {
-            item.content.forEach((contentItem: any) => {
-              if (contentItem?.type === 'output_text' && contentItem?.text) {
-                console.log(`✓ Extracted from raw_representation.raw_representation (${contentItem.text.length} chars)`);
-                contentTexts.push(contentItem.text);
-              }
-            });
-          }
-        });
-      }
-      
-      console.log(`Total texts extracted: ${contentTexts.length}`);
-      const finalContent = contentTexts.join('\n\n');
       console.log('Final content length:', finalContent.length);
       
       // ✅ Extract links from content
@@ -297,10 +299,7 @@ function GeneratedContentDisplay({ recordId, apiData, isExecutionComplete }: {
       console.log(`📎 Extracted ${links.length} links from content:`, links);
       setExtractedLinks(links);
       
-      // Store in session storage
-      if (finalContent) {
-        sessionStorage.setItem(`generatedContent_${recordId}`, finalContent);
-      }
+      // Don't store in session storage - clear on page refresh
       
       setContent(finalContent);
       setLoading(false);
@@ -310,7 +309,7 @@ function GeneratedContentDisplay({ recordId, apiData, isExecutionComplete }: {
     }
   };
   
-  // Show different states based on execution status
+  // Show different states based on content availability
   if (loading) {
     return (
       <Box sx={{ p: 2, bgcolor: '#18181b', borderRadius: 2, textAlign: 'center' }}>
@@ -319,23 +318,12 @@ function GeneratedContentDisplay({ recordId, apiData, isExecutionComplete }: {
     );
   }
   
-  // If execution is not complete yet, show waiting message
-  if (!isExecutionComplete && !content) {
-    return (
-      <Box sx={{ p: 2, bgcolor: '#18181b', borderRadius: 2, textAlign: 'center' }}>
-        <Typography sx={{ color: '#9CA3AF', fontSize: 12, fontStyle: 'italic' }}>
-          ⏳ Waiting for agents to complete execution...
-        </Typography>
-      </Box>
-    );
-  }
-  
-  // If execution is complete but no content, show empty state
+  // If no content yet, show waiting message
   if (!content) {
     return (
       <Box sx={{ p: 2, bgcolor: '#18181b', borderRadius: 2, textAlign: 'center' }}>
         <Typography sx={{ color: '#9CA3AF', fontSize: 12, fontStyle: 'italic' }}>
-          No content generated
+          ⏳ Waiting for content to be generated...
         </Typography>
       </Box>
     );
@@ -607,30 +595,21 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
   const [selectedAgentIdx, setSelectedAgentIdx] = useState<number | null>(null);
 
   
-  // Real-time logs state with session storage persistence
-  const [realTimeLogs, setRealTimeLogs] = useState<{ [key: number]: string[] }>(() => {
-    try {
-      const stored = sessionStorage.getItem('realTimeLogs');
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
-  });
+  // Real-time logs state - NO persistence, always fresh from WebSocket
+  const [realTimeLogs, setRealTimeLogs] = useState<{ [key: number]: string[] }>({});
   const wsRef = useRef<WebSocket | null>(null);
   const agentsRef = useRef(AGENTS);
+  
+  // Buffer to store all incoming logs before displaying them
+  const logBufferRef = useRef<Array<{ agentIndex: number; message: string }>>([]);
+  const isPlayingLogsRef = useRef(false);
   
   // Keep agentsRef in sync with AGENTS
   useEffect(() => {
     agentsRef.current = AGENTS;
   }, [AGENTS]);
   
-  // Persist logs to session storage (debounced)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      sessionStorage.setItem('realTimeLogs', JSON.stringify(realTimeLogs));
-    }, 100);
-    return () => clearTimeout(timeoutId);
-  }, [realTimeLogs]);
+  // No persistence for logs - removed sessionStorage saving
   
   // Ref for agent stack scrolling
   const agentStackRef = useRef<HTMLDivElement>(null);
@@ -638,7 +617,6 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
   const [orchMsg, setOrchMsg] = useState('Initialising pipeline...');
   const [done, setDone] = useState(false);
   const [started, setStarted] = useState(false);
-  const [waitingForLogs, setWaitingForLogs] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
 
@@ -648,6 +626,72 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
   const schedule = (fn: () => void, delay: number) => {
     const t = setTimeout(fn, delay);
     timerRef.current.push(t);
+  };
+
+  // Function to play buffered logs one by one with delay
+  const playBufferedLogs = () => {
+    if (isPlayingLogsRef.current || logBufferRef.current.length === 0) return;
+    
+    isPlayingLogsRef.current = true;
+    console.log(`🎬 Starting to play ${logBufferRef.current.length} buffered logs`);
+    
+    let currentIndex = 0;
+    const LOG_DELAY = 800; // milliseconds between each log (increased for slower playback)
+    
+    const playNextLog = () => {
+      if (currentIndex >= logBufferRef.current.length) {
+        console.log('✅ Finished playing all buffered logs');
+        isPlayingLogsRef.current = false;
+        logBufferRef.current = []; // Clear buffer
+        return;
+      }
+      
+      const { agentIndex, message } = logBufferRef.current[currentIndex];
+      console.log(`📤 Displaying log ${currentIndex + 1}/${logBufferRef.current.length} for agent ${agentIndex}`);
+      
+      // Add log to UI
+      setRealTimeLogs(prev => {
+        const existingLogs = prev[agentIndex] || [];
+        if (existingLogs.includes(message)) {
+          return prev; // Skip duplicates
+        }
+        return {
+          ...prev,
+          [agentIndex]: [...existingLogs, message]
+        };
+      });
+      
+      // Update agent status based on log message
+      const agentName = agentsRef.current[agentIndex]?.label || '';
+      if (message.includes('Called with prompt') || message.includes('Tool called') || message.includes('called with')) {
+        setPhase(agentIndex, 'working');
+        setOrchMsg(`${agentName} is processing...`);
+      } else if (message.includes('Successfully generated') || message.includes('completed') || message.includes('success')) {
+        setPhase(agentIndex, 'done', `${agentName} completed successfully`);
+        setOrchMsg(`✓ ${agentName} complete`);
+        
+        // Check if all agents are done
+        setTimeout(() => {
+          setAgentStates(currentStates => {
+            const allDone = currentStates.every(s => s.phase === 'done' || s.phase === 'failed');
+            if (allDone) {
+              console.log('✅ All agents completed - execution finished');
+              setDone(true);
+              onExecutionComplete?.(true);
+            }
+            return currentStates;
+          });
+        }, 100);
+      } else if (message.includes('Error') || message.includes('Failed') || message.includes('failed')) {
+        setPhase(agentIndex, 'failed');
+        setOrchMsg(`✗ ${agentName} failed`);
+      }
+      
+      currentIndex++;
+      setTimeout(playNextLog, LOG_DELAY);
+    };
+    
+    playNextLog();
   };
 
   const setPhase = (idx: number, phase: AgentPhase, returnMsg = '') => {
@@ -678,23 +722,40 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
 
   const runSimulation = async () => {
     console.log('🚀 Run button clicked');
+    console.log('Current started state:', started);
+    console.log('Current WebSocket ref:', wsRef.current);
     
-    // Only initialize on first run
-    if (!started) {
-      // Clear previous session logs and generated content for fresh start
-      sessionStorage.removeItem('realTimeLogs');
-      if (recordId) {
-        sessionStorage.removeItem(`generatedContent_${recordId}`);
-      }
-      setRealTimeLogs({});
+    // Clear previous session logs and generated content for fresh start
+    sessionStorage.removeItem('realTimeLogs');
+    if (recordId) {
+      sessionStorage.removeItem(`generatedContent_${recordId}`);
+    }
+    setRealTimeLogs({});
+    
+    // ✅ Clear the log buffer for new execution
+    logBufferRef.current = [];
+    isPlayingLogsRef.current = false;
+    console.log('🧹 Cleared log buffer for new execution');
+    
+    // Reset states
+    setDone(false);
+    onExecutionComplete?.(false);
+    setWindowStart(0);
+    setSelectedAgentIdx(0);
+    setOrchMsg('Connecting to WebSocket...');
+    setStarted(true);
+    
+    // Connect to WebSocket FIRST and wait for it to be ready
+    console.log('🔌 Attempting to connect WebSocket...');
+    connectWebSocket(async () => {
+      // This callback is called when WebSocket is connected
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('✅ WEBSOCKET CONNECTED - NOW CALLING API');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
-      // Show loading state
-      setWaitingForLogs(true);
+      setOrchMsg('WebSocket connected — triggering API...');
       
-      // Connect to WebSocket FIRST
-      connectWebSocket();
-      
-      // ✅ Call the API to trigger backend execution
+      // ✅ NOW call the API after WebSocket is connected
       if (recordId) {
         console.log(`📡 Calling API to trigger execution: http://127.0.0.1:8000/agents/agent/${recordId}`);
         try {
@@ -712,25 +773,22 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
             setAgentStates(getInitialStates(AGENTS.length));
           }
           
+          setOrchMsg('Pipeline triggered — waiting for agents...');
+          
           // Notify parent with API data for content display
           onApiDataReceived?.(data);
         } catch (error) {
           console.error('❌ Error calling API:', error);
           setAgentStates(getInitialStates(AGENTS.length));
+          setOrchMsg('Error calling API');
         }
       } else {
         setAgentStates(getInitialStates(AGENTS.length));
+        setOrchMsg('Pipeline triggered — waiting for agents...');
       }
-      
-      setDone(false);
-      onExecutionComplete?.(false);
-      setWindowStart(0);
-      setSelectedAgentIdx(0);
-      setOrchMsg('Pipeline triggered — waiting for agents...');
-      setStarted(true);
-      
-      console.log('Waiting for WebSocket logs to drive execution...');
-    }
+    });
+    
+    console.log('Waiting for WebSocket to connect before calling API...');
   };
 
   const runAgentsWithList = (idx: number, currentWindow: number, agentsList: any[]) => {
@@ -788,30 +846,65 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
   }, []);
 
   // Connect to WebSocket for real-time logs
-  const connectWebSocket = () => {
+  const connectWebSocket = (onConnected?: (ws: WebSocket) => void) => {
     if (wsRef.current) {
-      console.log('Closing existing WebSocket connection');
+      console.log('⚠️ Closing existing WebSocket connection');
+      console.log('Old WebSocket state:', wsRef.current.readyState);
       wsRef.current.close();
+      wsRef.current = null;
     }
     
-    console.log('Connecting to WebSocket: ws://localhost:8000/logs/ws/logs');
-    const ws = new WebSocket('ws://localhost:8000/logs/ws/logs');
-    wsRef.current = ws;
+    const wsUrl = 'ws://localhost:8000/logs/ws/logs';
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🔌 CONNECTING TO WEBSOCKET');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('WebSocket URL:', wsUrl);
+    console.log('Current time:', new Date().toISOString());
+    console.log('Record ID:', recordId);
     
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+    console.log('✓ WebSocket object created');
+    console.log('Initial ready state:', ws.readyState); // 0 = CONNECTING
+      
+    // Set up onopen handler - call the callback when connected
     ws.onopen = () => {
-      console.log('✓ WebSocket connected successfully');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('✅ WEBSOCKET CONNECTED SUCCESSFULLY');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('WebSocket URL:', ws.url);
+      console.log('WebSocket ready state:', ws.readyState); // 1 = OPEN
+      console.log('WebSocket protocol:', ws.protocol);
+      console.log('Time:', new Date().toISOString());
+      
+      // Call the callback if provided
+      if (onConnected) {
+        onConnected(ws);
+      }
     };
+    
+    // Ref to track if we're already waiting to play logs
+    let playbackTimeoutRef: ReturnType<typeof setTimeout> | null = null;
     
     ws.onmessage = (event) => {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log('📨 WebSocket message received:');
       console.log('Raw data:', event.data);
       
+      // Also log to window object so it's globally visible
+      if (!(window as any).websocketMessages) {
+        (window as any).websocketMessages = [];
+      }
+      (window as any).websocketMessages.push({
+        timestamp: new Date().toISOString(),
+        data: event.data
+      });
+      console.log('💾 Stored in window.websocketMessages:', (window as any).websocketMessages);
+      
       const logMessage = event.data;
       
       // Parse the log message to extract agent name using regex
       let agentIndex = -1;
-      let agentName = '';
       
       // Extract agent name from brackets [agent_name]
       const match = logMessage.match(/\[([a-zA-Z0-9_-]+)\]/);
@@ -819,6 +912,7 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
       if (match) {
         const rawAgent = match[1];
         console.log('Extracted agent from log:', rawAgent);
+        console.log('Available agent keys:', agentsRef.current.map(a => a.key));
         
         // Try multiple matching strategies
         agentIndex = agentsRef.current.findIndex(a => {
@@ -845,80 +939,66 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
           return false;
         });
         
-        agentName = rawAgent.replace(/_/g, ' ');
         console.log('Matched agent index:', agentIndex);
       }
       
       // If agent found, use that index, otherwise add to first agent
       const targetIndex = agentIndex >= 0 ? agentIndex : 0;
       
-      console.log('Adding log to agent index:', targetIndex);
+      console.log('📥 Buffering log for agent index:', targetIndex);
       
-      // Add log to the agent's log panel (avoid duplicates)
-      setRealTimeLogs(prev => {
-        const existingLogs = prev[targetIndex] || [];
-        // Check if this exact log message already exists
-        if (existingLogs.includes(logMessage)) {
-          console.log('Duplicate log detected, skipping');
-          return prev;
-        }
-        const updated = {
-          ...prev,
-          [targetIndex]: [...existingLogs, logMessage]
-        };
-        console.log('Updated logs:', updated);
-        
-        // First log received, stop waiting state
-        setWaitingForLogs(false);
-        
-        return updated;
+      // ✅ BUFFER THE LOG instead of displaying immediately
+      logBufferRef.current.push({
+        agentIndex: targetIndex,
+        message: logMessage
       });
       
-      // Determine status from log message
-      if (logMessage.includes('Called with prompt') || logMessage.includes('Tool called') || logMessage.includes('called with')) {
-        console.log(`🔄 Agent ${agentName} started working`);
-        if (agentIndex >= 0) {
-          setPhase(agentIndex, 'working');
-          setOrchMsg(`${agentName} is processing...`);
-        }
-      } else if (logMessage.includes('Successfully generated') || logMessage.includes('completed') || logMessage.includes('success')) {
-        console.log(`✓ Agent ${agentName} completed`);
-        if (agentIndex >= 0) {
-          setPhase(agentIndex, 'done', `${agentName} completed successfully`);
-          setOrchMsg(`✓ ${agentName} complete`);
-          
-          // Check if all agents are done after state update
-          setTimeout(() => {
-            setAgentStates(currentStates => {
-              const allDone = currentStates.every(s => s.phase === 'done' || s.phase === 'failed');
-              if (allDone) {
-                console.log('✅ All agents completed - execution finished');
-                setDone(true);
-                onExecutionComplete?.(true);
-              }
-              return currentStates;
-            });
-          }, 100);
-        }
-      } else if (logMessage.includes('Error') || logMessage.includes('Failed') || logMessage.includes('failed')) {
-        console.log(`✗ Agent ${agentName} failed`);
-        if (agentIndex >= 0) {
-          setPhase(agentIndex, 'failed');
-          setOrchMsg(`✗ ${agentName} failed`);
-        }
+      console.log(`📊 Buffer now has ${logBufferRef.current.length} logs`);
+      
+      // ✅ Reset the playback timer - wait 2 seconds after last message
+      if (playbackTimeoutRef) {
+        clearTimeout(playbackTimeoutRef);
       }
+      
+      playbackTimeoutRef = setTimeout(() => {
+        console.log('⏰ No new messages for 2 seconds - starting playback');
+        playBufferedLogs();
+      }, 2000); // Wait 2 seconds after the last message
       
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     };
     
     ws.onerror = (error) => {
-      console.error('❌ WebSocket error:', error);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('❌ WEBSOCKET ERROR');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.error('Error object:', error);
+      console.log('WebSocket ready state:', ws.readyState);
+      console.log('Time:', new Date().toISOString());
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     };
     
     ws.onclose = (event) => {
-      console.log('🔌 WebSocket disconnected');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🔌 WEBSOCKET DISCONNECTED');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log('Close code:', event.code);
+      console.log('Close reason:', event.reason);
+      console.log('Was clean:', event.wasClean);
+      console.log('Time:', new Date().toISOString());
+      console.log(`Buffered logs count: ${logBufferRef.current.length}`);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      // ✅ When WebSocket closes, start playing the buffered logs
+      if (logBufferRef.current.length > 0) {
+        console.log('🎬 WebSocket closed, starting to play buffered logs...');
+        setTimeout(() => playBufferedLogs(), 500); // Small delay before starting playback
+      }
     };
+    
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('WebSocket setup complete, waiting for connection...');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
     return ws;
   };
@@ -927,30 +1007,6 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
 
   return (
   <Box sx={{ width: '100%', height: '70vh', bgcolor: colors.bg, borderRadius: 3, boxShadow: isDark ? '0 2px 12px rgba(0,0,0,0.3)' : '0 2px 12px #0001', p: 2, display: 'flex', gap: 2, position: 'relative' }}>
-    {/* Loading Overlay */}
-    {waitingForLogs && (
-      <Box sx={{
-        position: 'absolute',
-        inset: 0,
-        bgcolor: 'rgba(255,255,255,0.8)',
-        backdropFilter: 'blur(4px)',
-        borderRadius: 3,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 2,
-        zIndex: 10
-      }}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#059669', animation: 'loadingDot1 1.4s ease-in-out infinite', '@keyframes loadingDot1': { '0%, 80%, 100%': { transform: 'scale(0)' }, '40%': { transform: 'scale(1)' } } }} />
-          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#059669', animation: 'loadingDot2 1.4s ease-in-out infinite', '@keyframes loadingDot2': { '0%, 80%, 100%': { transform: 'scale(0)' }, '40%': { transform: 'scale(1)' } }, animationDelay: '0.2s' }} />
-          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: '#059669', animation: 'loadingDot3 1.4s ease-in-out infinite', '@keyframes loadingDot3': { '0%, 80%, 100%': { transform: 'scale(0)' }, '40%': { transform: 'scale(1)' } }, animationDelay: '0.4s' }} />
-        </Box>
-        <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#059669' }}>Waiting for agents to start...</Typography>
-      </Box>
-    )}
-    
     {/* Main Flow Area - 55% */}
     <Box sx={{ width: '55%', display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* Top controls */}
@@ -1189,11 +1245,24 @@ export default function AgentQueue() {
   const currentExecution = getCurrentExecution();
   const currentWorkflow = currentExecution ? getWorkflows().find(w => w.id === currentExecution.workflowId) : null;
 
+  // 🔍 Debug: Log current execution details
+  useEffect(() => {
+    if (currentExecution) {
+      console.log('============================================');
+      console.log('📋 CURRENT WORKFLOW EXECUTION');
+      console.log('============================================');
+      console.log('Workflow ID:', currentExecution.workflowId);
+      console.log('Repository:', currentExecution.repository);
+      console.log('Record ID:', currentExecution.recordId);
+      console.log('Status:', currentExecution.status);
+      console.log('Started At:', currentExecution.startedAt);
+      console.log('➡️ Will call API: http://127.0.0.1:8000/agents/agent/' + currentExecution.recordId);
+      console.log('============================================\n');
+    }
+  }, []);
+
   // Shared API data state
   const [apiData, setApiData] = useState<any>(null);
-
-  // Track execution completion state
-  const [isExecutionComplete, setIsExecutionComplete] = useState(false);
 
   // Callback to receive API data from LiveOrchestration
   const handleApiDataReceived = (data: any) => {
@@ -1269,7 +1338,6 @@ export default function AgentQueue() {
               <LiveOrchestration 
                 repoName={currentExecution.repository} 
                 recordId={currentExecution.recordId} 
-                onExecutionComplete={setIsExecutionComplete}
                 onApiDataReceived={handleApiDataReceived}
               />
             </Box>
@@ -1283,7 +1351,6 @@ export default function AgentQueue() {
                 <GeneratedContentDisplay 
                   recordId={currentExecution.recordId} 
                   apiData={apiData}
-                  isExecutionComplete={isExecutionComplete}
                 />
               </Box>
             )}

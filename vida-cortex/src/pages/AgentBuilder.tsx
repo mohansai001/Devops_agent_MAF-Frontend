@@ -282,11 +282,56 @@ export default function AgentBuilder() {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   
-  const [availableAgents, setAvailableAgents] = useState<Agent[]>(ALL_AGENTS);
+  const [availableAgents, setAvailableAgents] = useState<Agent[]>([]);
   const [selectedAgents, setSelectedAgents] = useState<Agent[]>([]);
   const [promptDialog, setPromptDialog] = useState<{ open: boolean; agent: Agent | null }>({ open: false, agent: null });
   const [saveDialog, setSaveDialog] = useState(false);
+  const [masterPromptDialog, setMasterPromptDialog] = useState(false);
   const [workflowName, setWorkflowName] = useState('');
+  const [loadingAgents, setLoadingAgents] = useState(true);
+
+  // ✅ Fetch available agents from API on component mount
+  useEffect(() => {
+    fetchAvailableAgents();
+  }, []);
+
+  const fetchAvailableAgents = async () => {
+    setLoadingAgents(true);
+    try {
+      console.log('📡 Fetching available agents from API...');
+      const response = await fetch('http://127.0.0.1:8000/sql/sql/get_available_agents');
+      const data = await response.json();
+      console.log('✓ Received agents:', data);
+
+      // Transform API data to Agent format
+      const transformedAgents = data.map((apiAgent: any, index: number) => ({
+        id: `agent-${apiAgent.id}`,
+        key: apiAgent.agent_name,
+        icon: AGENT_ICONS[index % AGENT_ICONS.length],
+        color: AGENT_COLORS[index % AGENT_COLORS.length],
+        label: formatAgentName(apiAgent.agent_name),
+        task: `Processing with ${apiAgent.agent_name}...`,
+        success: `${formatAgentName(apiAgent.agent_name)} completed ✓`,
+      }));
+
+      setAvailableAgents(transformedAgents);
+      console.log('✓ Transformed agents:', transformedAgents);
+    } catch (error) {
+      console.error('❌ Error fetching agents:', error);
+      // Fallback to hardcoded agents
+      setAvailableAgents(ALL_AGENTS);
+    } finally {
+      setLoadingAgents(false);
+    }
+  };
+
+  // Helper function to format agent name (e.g., "github_agent" -> "GitHub Agent")
+  const formatAgentName = (name: string): string => {
+    return name
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   const colors = {
     bg: isDark ? '#0f0f0f' : '#f8fafc',
@@ -343,14 +388,28 @@ export default function AgentBuilder() {
   };
 
   const clearPipeline = () => {
-    setAvailableAgents(ALL_AGENTS);
+    // Move all selected agents back to available agents (no need to refetch from API)
+    selectedAgents.forEach(agent => {
+      const { prompt, ...agentWithoutPrompt } = agent;
+      setAvailableAgents(prev => [...prev, agentWithoutPrompt]);
+    });
     setSelectedAgents([]);
   };
 
   const handleSaveWorkflow = () => {
     if (!workflowName.trim()) return;
     
-    // Prepare workflow data with agent prompts
+    // Show master prompt dialog before saving
+    setMasterPromptDialog(true);
+  };
+
+  const handleConfirmSaveWorkflow = async () => {
+    if (!workflowName.trim()) return;
+    
+    // Get current user from localStorage
+    const currentUser = localStorage.getItem('currentUser') || 'admin';
+    
+    // Prepare workflow data with agent prompts (for localStorage)
     const workflowData = {
       name: workflowName,
       agents: selectedAgents.map(a => ({
@@ -361,6 +420,21 @@ export default function AgentBuilder() {
         prompt: a.prompt,
         success: a.success,
       })),
+    };
+
+    // Prepare API payload
+    const apiPayload = {
+      workflow_id: 0, // New workflow
+      version: "1.0",
+      data: {
+        workflow: workflowData,
+      },
+      file_name: workflowName.toLowerCase().replace(/\s+/g, '_') + '.json',
+      agents: selectedAgents.map(a => a.key), // Use agent keys (agent_name)
+      created_at: new Date().toISOString(),
+      created_by: currentUser,
+      updated_at: new Date().toISOString(),
+      updated_by: currentUser,
     };
 
     // 🔍 Print workflow details to console
@@ -375,6 +449,7 @@ export default function AgentBuilder() {
     selectedAgents.forEach((agent, index) => {
       console.log(`\n🤖 Agent ${index + 1}: ${agent.label}`);
       console.log(`   ID: ${agent.id}`);
+      console.log(`   Key: ${agent.key}`);
       console.log(`   Color: ${agent.color}`);
       console.log(`   Default Task: ${agent.task}`);
       if (agent.prompt && agent.prompt.trim()) {
@@ -385,16 +460,76 @@ export default function AgentBuilder() {
     });
     
     console.log('\n============================================');
-    console.log('📦 Complete Workflow Data:');
+    console.log('📦 Complete Workflow Data (localStorage):');
     console.log(JSON.stringify(workflowData, null, 2));
+    console.log('============================================');
+    console.log('📡 API Payload:');
+    console.log(JSON.stringify(apiPayload, null, 2));
     console.log('============================================\n');
 
-    // Save the workflow
-    saveWorkflow(workflowData);
-    
-    setSaveDialog(false);
-    setWorkflowName('');
-    navigate('/workflows');
+    try {
+      // 📡 Save to API
+      console.log('📡 Sending workflow to API...');
+      const response = await fetch('http://127.0.0.1:8000/sql/sql/push_workflow_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiPayload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ API Response Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Workflow saved to API successfully:', result);
+
+      // Also save to localStorage for offline access
+      saveWorkflow(workflowData);
+      console.log('✅ Workflow saved to localStorage');
+
+      // Close all dialogs
+      setMasterPromptDialog(false);
+      setSaveDialog(false);
+      setWorkflowName('');
+      navigate('/workflows');
+    } catch (error) {
+      console.error('❌ Error saving workflow to API:', error);
+      
+      // Check if it's a CORS error
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        console.warn('⚠️ CORS Error: Backend needs to allow requests from http://localhost:5173');
+        console.warn('⚠️ Add these headers to your FastAPI backend:');
+        console.warn(`
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+        `);
+      }
+      
+      // Fallback: Save to localStorage only
+      saveWorkflow(workflowData);
+      console.log('⚠️ Workflow saved to localStorage only (API unavailable)');
+      
+      // Still navigate on fallback
+      setMasterPromptDialog(false);
+      setSaveDialog(false);
+      setWorkflowName('');
+      navigate('/workflows');
+    }
   };
 
   return (
@@ -442,16 +577,43 @@ export default function AgentBuilder() {
                 border: `2px dashed ${colors.border}`,
                 borderRadius: 2,
               }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
-                  {availableAgents.map((agent) => (
-                    <AgentCard 
-                      key={agent.id} 
-                      agent={agent} 
-                      onClick={() => addAgent(agent)}
-                      showAdd={true}
-                    />
-                  ))}
-                </Box>
+                {loadingAgents ? (
+                  <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    height: '400px',
+                    gap: 2,
+                  }}>
+                    <Typography sx={{ color: colors.textSecondary, fontSize: 14 }}>
+                      Loading agents from API...
+                    </Typography>
+                    <Box sx={{ 
+                      width: 40, 
+                      height: 40, 
+                      border: `3px solid ${colors.border}`,
+                      borderTop: `3px solid #3b82f6`,
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                      '@keyframes spin': {
+                        '0%': { transform: 'rotate(0deg)' },
+                        '100%': { transform: 'rotate(360deg)' },
+                      }
+                    }} />
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                    {availableAgents.map((agent) => (
+                      <AgentCard 
+                        key={agent.id} 
+                        agent={agent} 
+                        onClick={() => addAgent(agent)}
+                        showAdd={true}
+                      />
+                    ))}
+                  </Box>
+                )}
               </Box>
             </CardContent>
           </Card>
@@ -586,6 +748,133 @@ export default function AgentBuilder() {
             <Button onClick={handleSaveWorkflow} variant="contained" disabled={!workflowName.trim()}
               startIcon={<SaveIcon />}>
               Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Master Prompt Dialog - Shows all agent prompts */}
+        <Dialog 
+          open={masterPromptDialog} 
+          onClose={() => setMasterPromptDialog(false)} 
+          maxWidth="md" 
+          fullWidth
+        >
+          <DialogTitle sx={{ color: isDark ? '#e5e7eb' : '#111', borderBottom: `1px solid ${isDark ? '#374151' : '#e5e7eb'}` }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SaveIcon sx={{ color: '#059669' }} />
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Master Prompt - Review Before Saving
+              </Typography>
+            </Box>
+            <Typography sx={{ fontSize: 12, color: isDark ? '#9ca3af' : '#6b7280', mt: 1, fontWeight: 400 }}>
+              Workflow: <strong>{workflowName}</strong> · {selectedAgents.length} Agents
+            </Typography>
+          </DialogTitle>
+          <DialogContent sx={{ p: 0 }}>
+            <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+              {selectedAgents.map((agent, index) => {
+                const Icon = agent.icon;
+                return (
+                  <Box 
+                    key={agent.id}
+                    sx={{ 
+                      p: 2, 
+                      borderBottom: index < selectedAgents.length - 1 ? `1px solid ${isDark ? '#374151' : '#e5e7eb'}` : 'none',
+                      bgcolor: isDark ? (index % 2 === 0 ? '#1a1a1d' : '#111') : (index % 2 === 0 ? '#f9fafb' : '#fff')
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                      {/* Agent Icon & Number */}
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                        <Box 
+                          sx={{ 
+                            width: 40, 
+                            height: 40, 
+                            borderRadius: '50%', 
+                            bgcolor: `${agent.color}18`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        >
+                          <Icon sx={{ fontSize: 20, color: agent.color }} />
+                        </Box>
+                        <Typography sx={{ fontSize: 10, color: isDark ? '#6b7280' : '#9ca3af', fontWeight: 600 }}>
+                          #{index + 1}
+                        </Typography>
+                      </Box>
+
+                      {/* Agent Details */}
+                      <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontSize: 14, fontWeight: 600, color: isDark ? '#e5e7eb' : '#111', mb: 0.5 }}>
+                          {agent.label}
+                        </Typography>
+                        <Typography sx={{ fontSize: 11, color: isDark ? '#6b7280' : '#9ca3af', mb: 1 }}>
+                          Default: {agent.task}
+                        </Typography>
+                        
+                        {/* Prompt Display */}
+                        {agent.prompt && agent.prompt.trim() ? (
+                          <Box 
+                            sx={{ 
+                              mt: 1, 
+                              p: 1.5, 
+                              bgcolor: isDark ? '#232326' : '#f3f4f6',
+                              borderRadius: 1,
+                              border: `1px solid ${agent.color}40`
+                            }}
+                          >
+                            <Typography sx={{ fontSize: 10, color: agent.color, fontWeight: 600, mb: 0.5, textTransform: 'uppercase' }}>
+                              Custom Prompt:
+                            </Typography>
+                            <Typography 
+                              sx={{ 
+                                fontSize: 12, 
+                                color: isDark ? '#d1d5db' : '#374151',
+                                fontFamily: 'monospace',
+                                whiteSpace: 'pre-wrap',
+                                wordBreak: 'break-word'
+                              }}
+                            >
+                              {agent.prompt}
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <Box 
+                            sx={{ 
+                              mt: 1, 
+                              p: 1.5, 
+                              bgcolor: isDark ? '#1a1a1d' : '#fef3c7',
+                              borderRadius: 1,
+                              border: `1px solid ${isDark ? '#374151' : '#fbbf24'}`
+                            }}
+                          >
+                            <Typography sx={{ fontSize: 11, color: isDark ? '#9ca3af' : '#92400e', fontStyle: 'italic' }}>
+                              ⚠️ No custom prompt - will use default task
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, borderTop: `1px solid ${isDark ? '#374151' : '#e5e7eb'}` }}>
+            <Button 
+              onClick={() => setMasterPromptDialog(false)} 
+              sx={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmSaveWorkflow} 
+              variant="contained" 
+              startIcon={<SaveIcon />}
+              sx={{ bgcolor: '#059669', '&:hover': { bgcolor: '#047857' } }}
+            >
+              Confirm & Save Workflow
             </Button>
           </DialogActions>
         </Dialog>
