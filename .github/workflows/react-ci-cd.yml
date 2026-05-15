@@ -40,7 +40,7 @@ jobs:
           name: react-app
           path: vida-cortex/dist
 
-  # Optional SAST Job (currently bypassed)
+  #  SAST Job 
   sast:
     name: Security Scan (SAST)
     runs-on: ubuntu-latest
