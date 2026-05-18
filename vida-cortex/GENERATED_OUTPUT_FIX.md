@@ -58,7 +58,7 @@ if (
 
 ## What Gets Displayed
 
-When you navigate to `/approvals?recordId=2` and the API returns data from `http://127.0.0.1:8000/agents/agent/2`, the "GENERATED OUTPUT" section will now show:
+When you navigate to `/approvals?recordId=2` and the API returns data from `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2`, the "GENERATED OUTPUT" section will now show:
 
 ````yaml
 Saved-as: .github/workflows/ci.yml
@@ -85,7 +85,7 @@ Plus all the notes and requirements explaining the configuration.
 ## How to Test
 
 1. Navigate to: `http://localhost:5173/approvals?recordId=2`
-2. The page will fetch from `http://127.0.0.1:8000/agents/agent/2`
+2. The page will fetch from `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2`
 3. Look for console logs showing extraction:
    - `Checking raw_representation.raw_representation.output (nested deeper)`
    - `✓ Extracted from raw_representation.raw_representation (XXXX chars)`

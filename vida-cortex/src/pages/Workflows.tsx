@@ -38,7 +38,7 @@ export default function Workflows() {
 
   const fetchRepositories = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/sql/sql/get_all_triggered_records');
+      const response = await fetch('https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/sql/sql/get_all_triggered_records');
       const data = await response.json();
       console.log('📡 Fetched repositories from API:', data);
       console.log('📋 Repository IDs:', data.map((r: any) => ({ repo: r.repo, id: r.id })));
@@ -84,7 +84,7 @@ export default function Workflows() {
         console.log('🚀 Executing workflow:', executeDialog.workflow.name);
         console.log('📦 Selected repository:', selectedRecord.repo);
         console.log('🔢 Record ID from API:', selectedRecord.id);
-        console.log('➡️ Will call: http://127.0.0.1:8000/agents/agent/' + selectedRecord.id);
+        console.log('➡️ Will call: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/' + selectedRecord.id);
         
         startWorkflowExecution(executeDialog.workflow.id, selectedRecord.repo, selectedRecord.id);
         setExecuteDialog({ open: false, workflow: null });

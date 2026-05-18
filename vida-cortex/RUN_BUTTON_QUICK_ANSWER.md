@@ -113,7 +113,7 @@ When you click the **"▶ Run"** button in the Approvals page, it starts an **or
 
 ### API Endpoints Used:
 
-1. **GET** `http://127.0.0.1:8000/agents/agent/{recordId}`
+1. **GET** `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/{recordId}`
    - Fetches agent configuration
    - Returns agent names, descriptions, parameters
 
@@ -143,7 +143,7 @@ idle → delegating → working → returning → done
 ```
 Run button clicked
 Record ID: abc123
-Calling API: http://127.0.0.1:8000/agents/agent/abc123
+Calling API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/abc123
 API Response: {raw_representation: {tools: [...]}}
 Found tools in raw_representation: [github_agent, yaml_builder, terraform_agent]
 Building agents array from API response

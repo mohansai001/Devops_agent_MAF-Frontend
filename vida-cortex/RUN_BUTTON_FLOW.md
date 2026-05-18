@@ -53,7 +53,7 @@ If a `recordId` parameter exists in the URL:
 ```typescript
 const fetchAgentsFromAPI = async () => {
   const response = await fetch(
-    `http://127.0.0.1:8000/agents/agent/${recordId}`,
+    `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${recordId}`,
   );
   const data = await response.json();
 
@@ -70,7 +70,7 @@ const fetchAgentsFromAPI = async () => {
 
 **What happens:**
 
-- 🌐 Calls API: `http://127.0.0.1:8000/agents/agent/{recordId}`
+- 🌐 Calls API: `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/{recordId}`
 - 📦 Receives agent configuration (tools/agents list)
 - 🔍 Parses agent names, descriptions, parameters
 - 🎨 Maps to UI format with colors and icons
@@ -299,7 +299,7 @@ Show Loading Overlay
     ↓
 Connect WebSocket (ws://localhost:8000/logs/ws/logs)
     ↓
-Fetch Agents from API (http://127.0.0.1:8000/agents/agent/{recordId})
+Fetch Agents from API (https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/{recordId})
     ↓
 Parse Agent Configuration
     ↓
@@ -396,7 +396,7 @@ When Run is clicked:
 ```javascript
 Run button clicked
 Record ID: abc123
-Calling API: http://127.0.0.1:8000/agents/agent/abc123
+Calling API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/abc123
 API Response: {...}
 Found tools in raw_representation: [...]
 Building agents array from API response

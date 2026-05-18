@@ -3,7 +3,7 @@
 ## Test Endpoint
 
 ```
-GET http://127.0.0.1:8000/agents/agent/2
+GET https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2
 ```
 
 ## Result: ✅ SUCCESS

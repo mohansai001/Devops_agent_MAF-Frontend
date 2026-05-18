@@ -9,7 +9,7 @@
    ↓
 3. useEffect triggers fetchApiData(2) [ONLY ONCE]
    ↓
-4. API: GET http://127.0.0.1:8000/agents/agent/2
+4. API: GET https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2
    ↓
 5. Response stored in apiData state
    ↓
@@ -120,7 +120,7 @@ Total: 1 API call
 
 # Click "Run" button
 # Look for: "📦 Using agents from shared API data"
-# Should NOT see: "Calling API: http://127.0.0.1:8000/agents/agent/2"
+# Should NOT see: "Calling API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2"
 ```
 
 ---

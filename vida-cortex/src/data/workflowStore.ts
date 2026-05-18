@@ -77,7 +77,7 @@ export function clearCurrentExecution(): void {
 // Fetch workflows from API
 export async function fetchWorkflowsFromAPI(): Promise<Workflow[]> {
   try {
-    const response = await fetch('http://127.0.0.1:8000/sql/sql/get_workflows');
+    const response = await fetch('https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/sql/sql/get_workflows');
     const data = await response.json();
     
     // Transform API response to Workflow format

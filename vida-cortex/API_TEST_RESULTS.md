@@ -1,4 +1,4 @@
-# ✅ API Test Results: http://127.0.0.1:8000/agents/agent/2
+# ✅ API Test Results: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2
 
 ## Test Status: **SUCCESS** ✓
 
@@ -168,7 +168,7 @@ Based on the API response, the UI should show:
 ## Console Output When Fetching
 
 ```javascript
-Calling API: http://127.0.0.1:8000/agents/agent/2
+Calling API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2
 API Response: {...}
 API Response Type: object
 API Response Keys: [
@@ -298,7 +298,7 @@ This will:
 
 **API Test: ✅ SUCCESS**
 
-The API endpoint `http://127.0.0.1:8000/agents/agent/2` is working correctly and returns:
+The API endpoint `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2` is working correctly and returns:
 
 - 2 agents: **Yaml_Agent** and **terraform_agent**
 - Complete tool definitions with parameters

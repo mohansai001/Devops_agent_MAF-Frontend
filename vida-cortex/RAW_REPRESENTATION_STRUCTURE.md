@@ -94,7 +94,7 @@ if (data?.raw_representation?.tools) {
 Run this PowerShell command to save the **full** response:
 
 ```powershell
-$response = Invoke-WebRequest -Uri "http://127.0.0.1:8000/agents/agent/2" -Method GET
+$response = Invoke-WebRequest -Uri "https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2" -Method GET
 $response.Content | Out-File -FilePath ".\full_api_response.json" -Encoding UTF8
 ```
 

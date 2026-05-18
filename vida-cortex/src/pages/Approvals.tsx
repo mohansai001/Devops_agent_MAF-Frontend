@@ -822,9 +822,9 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
       
       // ✅ NOW call the API after WebSocket is connected
       if (recordId) {
-        console.log(`📡 Calling API to trigger execution: http://127.0.0.1:8000/agents/agent/${recordId}`);
+        console.log(`📡 Calling API to trigger execution: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${recordId}`);
         try {
-          const response = await fetch(`http://127.0.0.1:8000/agents/agent/${recordId}`);
+          const response = await fetch(`https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${recordId}`);
           const data = await response.json();
           console.log('✓ API Response:', data);
           
@@ -931,7 +931,7 @@ function LiveOrchestration({ repoName: _repoName, recordId, onExecutionComplete,
       wsRef.current = null;
     }
     
-    const wsUrl = 'ws://localhost:8000/logs/ws/logs';
+    const wsUrl = 'wss://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/logs/ws/logs';
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🔌 CONNECTING TO WEBSOCKET');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -1333,7 +1333,7 @@ export default function AgentQueue() {
       console.log('Record ID:', currentExecution.recordId);
       console.log('Status:', currentExecution.status);
       console.log('Started At:', currentExecution.startedAt);
-      console.log('➡️ Will call API: http://127.0.0.1:8000/agents/agent/' + currentExecution.recordId);
+      console.log('➡️ Will call API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/' + currentExecution.recordId);
       console.log('============================================\n');
     }
   }, []);

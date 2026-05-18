@@ -299,7 +299,7 @@ export default function AgentBuilder() {
     setLoadingAgents(true);
     try {
       console.log('📡 Fetching available agents from API...');
-      const response = await fetch('http://127.0.0.1:8000/sql/sql/get_available_agents');
+      const response = await fetch('https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/sql/sql/get_available_agents');
       const data = await response.json();
       console.log('✓ Received agents:', data);
 
@@ -470,7 +470,7 @@ export default function AgentBuilder() {
     try {
       // 📡 Save to API
       console.log('📡 Sending workflow to API...');
-      const response = await fetch('http://127.0.0.1:8000/sql/sql/push_workflow_details', {
+      const response = await fetch('https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/sql/sql/push_workflow_details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

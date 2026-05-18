@@ -6,7 +6,7 @@ The application was making **multiple redundant API calls** to the same endpoint
 
 - `LiveOrchestration` component called API on every "Run" click
 - `GeneratedContentDisplay` component called API independently
-- Both fetched from `http://127.0.0.1:8000/agents/agent/${recordId}`
+- Both fetched from `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${recordId}`
 
 **Result:** 2+ API calls per page load, wasting bandwidth and causing inconsistencies.
 
@@ -41,7 +41,9 @@ const fetchApiData = async (id: number) => {
   setLoadingApiData(true);
   try {
     console.log(`📡 [AgentQueue] Fetching API data ONCE for record ID: ${id}`);
-    const response = await fetch(`http://127.0.0.1:8000/agents/agent/${id}`);
+    const response = await fetch(
+      `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${id}`,
+    );
     const data = await response.json();
     console.log("✓ [AgentQueue] API Response received:", data);
     setApiData(data);
@@ -77,7 +79,7 @@ const fetchApiData = async (id: number) => {
 ```typescript
 const fetchAgentsFromAPI = async () => {
   const response = await fetch(
-    `http://127.0.0.1:8000/agents/agent/${recordId}`,
+    `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${recordId}`,
   );
   // ... fetch logic
 };
@@ -137,7 +139,7 @@ function LiveOrchestration({
 function GeneratedContentDisplay({ recordId }: { recordId: number }) {
   const fetchContent = async () => {
     const response = await fetch(
-      `http://127.0.0.1:8000/agents/agent/${recordId}`,
+      `https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/${recordId}`,
     ); // ❌ Duplicate fetch
     const data = await response.json();
     // ... extraction logic
@@ -195,12 +197,12 @@ function GeneratedContentDisplay({
 ### Before
 
 ```
-Calling API: http://127.0.0.1:8000/agents/agent/2
+Calling API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2
 API Response: {...}
 Fetching content for record ID: 2
 API Response: {...}  // Duplicate!
 Run button clicked
-Calling API: http://127.0.0.1:8000/agents/agent/2  // Again!
+Calling API: https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2  // Again!
 ```
 
 ### After
@@ -247,7 +249,7 @@ Calling API: http://127.0.0.1:8000/agents/agent/2  // Again!
 │          AgentQueue (Parent)                │
 │                                             │
 │  📡 Fetch API ONCE on mount                 │
-│  └─ http://127.0.0.1:8000/agents/agent/2   │
+│  └─ https://devopsagent-backend-aegmehh9gcetepbf.eastus-01.azurewebsites.net/agents/agent/2   │
 │                                             │
 │  State: apiData = { ... }                   │
 └────────────┬───────────────┬────────────────┘
