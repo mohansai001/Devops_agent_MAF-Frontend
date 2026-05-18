@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Card, CardContent, Typography, Button, Chip, useTheme, IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import { Box, Typography, Button, useTheme, IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import SearchIcon from '@mui/icons-material/Search';
@@ -61,218 +61,34 @@ interface Agent {
   prompt?: string;
 }
 
+
 // Prompt Dialog Component
-function PromptDialog({ 
-  open, 
-  onClose, 
-  agent, 
-  onSave 
-}: { 
-  open: boolean; 
-  onClose: () => void; 
-  agent: Agent | null; 
-  onSave: (prompt: string) => void; 
-}) {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-  const [prompt, setPrompt] = useState('');
-
+function PromptDialog({ open, onClose, agent, onSave }: { open: boolean; onClose: () => void; agent: Agent | null; onSave: (prompt: string) => void; }) {
+  const [prompt, setPrompt] = useState(agent?.prompt || '');
   useEffect(() => {
-    if (agent) {
-      setPrompt(agent.prompt || '');
-    }
+    setPrompt(agent?.prompt || '');
   }, [agent]);
-
-  const handleSave = () => {
-    onSave(prompt);
-    onClose();
-  };
-
-  if (!agent) return null;
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ color: isDark ? '#e5e7eb' : '#111' }}>
-        Configure Prompt for {agent.label}
-      </DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Edit Agent Prompt</DialogTitle>
       <DialogContent>
-        <Box sx={{ mb: 2 }}>
-          <Typography sx={{ fontSize: 12, color: isDark ? '#9ca3af' : '#6b7280', mb: 1 }}>
-            Default Task: {agent.task}
-          </Typography>
-        </Box>
+        <Typography gutterBottom>
+          Configure a custom prompt for <b>{agent?.label}</b> (optional):
+        </Typography>
         <TextField
           fullWidth
           multiline
-          rows={6}
-          label="Custom Prompt (Optional)"
-          placeholder="Enter custom instructions for this agent..."
+          minRows={3}
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          helperText="Leave empty to use default task, or provide custom instructions"
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              bgcolor: isDark ? '#2a2a2a' : '#fff',
-            },
-            '& .MuiInputLabel-root': {
-              color: isDark ? '#9ca3af' : '#6b7280',
-            },
-            '& .MuiOutlinedInput-input': {
-              color: isDark ? '#e5e7eb' : '#111',
-            }
-          }}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder={agent?.task}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} sx={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
-          Cancel
-        </Button>
-        <Button onClick={handleSave} variant="contained">
-          Save Prompt
-        </Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={() => { onSave(prompt); onClose(); }} variant="contained">Save</Button>
       </DialogActions>
     </Dialog>
-  );
-}
-
-// Agent Card Component
-function AgentCard({ agent, onClick, showAdd = false }: { agent: Agent; onClick?: () => void; showAdd?: boolean }) {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-  const Icon = agent.icon;
-
-  const cardClasses = `agent-card ${
-    isDark ? 'dark-agent-card' : 'light-agent-card'
-  }`;
-
-  const iconContainerStyle = {
-    backgroundColor: `${agent.color}18`
-  };
-
-  const addIconStyle = {
-    backgroundColor: `${agent.color}20`,
-    color: agent.color
-  };
-
-  return (
-    <Card 
-      onClick={onClick}
-      className={cardClasses}
-      style={{
-        borderColor: isDark ? '#374151' : 'rgba(0,0,0,0.1)',
-        boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)'
-      }}
-    >
-      <CardContent className="agent-card-content">
-        <div className="agent-card-inner">
-          <div className="agent-card-icon-container" style={iconContainerStyle}>
-            <Icon className="agent-card-icon" style={{ color: agent.color }} />
-          </div>
-          <div className="agent-card-text">
-            <Typography className="agent-card-title" style={{ color: isDark ? '#e5e7eb' : '#111' }}>
-              {agent.label}
-            </Typography>
-            <Typography className="agent-card-description" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
-              {agent.task.substring(0, 40)}...
-            </Typography>
-          </div>
-          {showAdd && (
-            <div className="add-icon-container" style={addIconStyle}>
-              <AddIcon className="add-icon" />
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-const WINDOW_SIZE = 5;
-
-// Agents Flow with per-agent highlight + sliding window
-function AgentsFlow({ selectedAgents }: { selectedAgents: Agent[] }) {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
-  const [windowStart, setWindowStart] = useState(0);
-
-  const total = selectedAgents.length;
-  const visibleAgents = selectedAgents.slice(windowStart, windowStart + WINDOW_SIZE);
-
-  return (
-    <div>
-      <div className="agents-flow-header">
-        <Typography className="agents-flow-title" style={{ color: isDark ? '#e5e7eb' : '#111' }}>
-          Agents Flow
-        </Typography>
-        <div className="flow-navigation">
-          {total > WINDOW_SIZE && (
-            <>
-              <Button 
-                size="small" 
-                variant="outlined" 
-                disabled={windowStart === 0}
-                onClick={() => setWindowStart(w => Math.max(0, w - 1))}
-                className="nav-button"
-              >
-                ◀
-              </Button>
-              <Typography className="nav-counter" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
-                {windowStart + 1}–{Math.min(windowStart + WINDOW_SIZE, total)} of {total}
-              </Typography>
-              <Button 
-                size="small" 
-                variant="outlined" 
-                disabled={windowStart + WINDOW_SIZE >= total}
-                onClick={() => setWindowStart(w => Math.min(total - WINDOW_SIZE, w + 1))}
-                className="nav-button"
-              >
-                ▶
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-      <div className="agents-container">
-        {visibleAgents.map((agent, i) => {
-          const globalIdx = windowStart + i;
-          const Icon = agent.icon;
-          const connectorColor = isDark ? '#4B5563' : '#D1D5DB';
-          const borderColor = isDark ? '#374151' : 'rgba(0,0,0,0.1)';
-          const bgColor = isDark ? '#2a2a2a' : '#fafafa';
-          const labelColor = isDark ? '#9ca3af' : '#9CA3AF';
-          
-          return (
-            <div key={agent.id} className="agent-flow-item">
-              {i > 0 && (
-                <div className="agent-connector">
-                  <div className="connector-line" style={{ backgroundColor: connectorColor }} />
-                  <div className="connector-arrow" style={{ borderLeftColor: `6px solid ${connectorColor}` }} />
-                </div>
-              )}
-              <div 
-                className="agent-flow-box"
-                style={{
-                  borderColor: borderColor,
-                  backgroundColor: bgColor
-                }}
-              >
-                <div className="agent-icon-container" style={{ backgroundColor: `${agent.color}20` }}>
-                  <Icon className="agent-icon" style={{ color: agent.color }} />
-                </div>
-                <Typography className="agent-flow-label" style={{ color: agent.color }}>
-                  {agent.label}
-                </Typography>
-                <div>
-                  <Typography className="agent-step-label" style={{ color: labelColor }}>
-                    Step {globalIdx + 1}
-                  </Typography>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
@@ -333,17 +149,88 @@ export default function AgentBuilder() {
       .join(' ');
   };
 
+  // Drag and Drop Handler
+  const handleDragEnd = (result: DropResult) => {
+    const { source, destination, draggableId } = result;
+
+    console.log('🔄 Drag End:', { source, destination, draggableId });
+
+    // If dropped outside a droppable area
+    if (!destination) {
+      console.log('❌ Dropped outside droppable area');
+      return;
+    }
+
+    // If dropped in the same place
+    if (source.droppableId === destination.droppableId && source.index === destination.index) {
+      console.log('⚠️ Dropped in same place');
+      return;
+    }
+
+    // Dragging from Available Agents to Selected Agents (workspace)
+    if (source.droppableId === 'available-agents' && destination.droppableId === 'selected-agents') {
+      console.log('✅ Moving from Available to Selected');
+      const agent = availableAgents.find(a => a.id === draggableId);
+      console.log('Found agent:', agent);
+      if (agent) {
+        console.log('Before:', { availableAgents: availableAgents.length, selectedAgents: selectedAgents.length });
+        // Add to selected agents
+        const newAgent = { ...agent, prompt: '' };
+        setSelectedAgents(prev => {
+          const updated = [...prev, newAgent];
+          console.log('Updated selectedAgents:', updated);
+          return updated;
+        });
+        // Remove from available agents
+        setAvailableAgents(prev => {
+          const updated = prev.filter(a => a.id !== agent.id);
+          console.log('Updated availableAgents:', updated);
+          return updated;
+        });
+        console.log('✅ Agent moved to workflow');
+      } else {
+        console.log('❌ Agent not found in availableAgents');
+      }
+      return;
+    }
+
+    // Dragging from Selected Agents back to Available Agents
+    if (source.droppableId === 'selected-agents' && destination.droppableId === 'available-agents') {
+      console.log('✅ Moving from Selected back to Available');
+      const agent = selectedAgents.find(a => a.id === draggableId);
+      if (agent) {
+        // Create agent without prompt for available agents
+        const agentCopy = { ...agent };
+        delete agentCopy.prompt;
+        
+        // Add to available agents
+        setAvailableAgents(prev => [...prev, agentCopy]);
+        // Remove from selected agents
+        setSelectedAgents(prev => prev.filter(a => a.id !== agent.id));
+        console.log('✅ Agent moved back to available');
+      }
+      return;
+    }
+
+    // Reordering within Selected Agents
+    if (source.droppableId === 'selected-agents' && destination.droppableId === 'selected-agents') {
+      console.log('↕️ Reordering within Selected Agents');
+      const newSelectedAgents = Array.from(selectedAgents);
+      const [moved] = newSelectedAgents.splice(source.index, 1);
+      newSelectedAgents.splice(destination.index, 0, moved);
+      setSelectedAgents(newSelectedAgents);
+      return;
+    }
+
+    console.log('⚠️ No matching drag rule');
+  };
+
   const colors = {
     bg: isDark ? '#0f0f0f' : '#f8fafc',
     cardBg: isDark ? '#1a1a1a' : '#fff',
     text: isDark ? '#e5e7eb' : '#111',
     textSecondary: isDark ? '#9ca3af' : '#6b7280',
     border: isDark ? '#374151' : 'rgba(0,0,0,0.1)',
-  };
-
-  const addAgent = (agent: Agent) => {
-    setAvailableAgents(prev => prev.filter(a => a.id !== agent.id));
-    setSelectedAgents(prev => [...prev, { ...agent, prompt: '' }]);
   };
 
   const removeAgent = (agentId: string) => {
@@ -533,10 +420,10 @@ app.add_middleware(
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: colors.bg, p: 2, pt: 1 }}>
-      <Box sx={{ maxWidth: 1400, mx: 'auto' }}>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Box sx={{ minHeight: '100vh', bgcolor: colors.bg, display: 'flex', flexDirection: 'column' }}>
         {/* Top bar */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1.5, mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1.5, p: 2, pb: 1, borderBottom: `1px solid ${colors.border}` }}>
           {selectedAgents.length > 0 && (
             <Button
               variant="contained"
@@ -552,172 +439,240 @@ app.add_middleware(
           </Button>
         </Box>
 
-        {/* Agents Flow */}
-        {selectedAgents.length > 0 && (
-          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}`, mb: 3 }}>
-            <CardContent>
-              <AgentsFlow selectedAgents={selectedAgents} />
-            </CardContent>
-          </Card>
-        )}
-
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, mb: 4 }}>
-          {/* Available Agents */}
-          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
-            <CardContent>
-              <Typography sx={{ fontSize: 16, fontWeight: 700, color: colors.text, mb: 2 }}>
-                Available Agents ({availableAgents.length})
-              </Typography>
-              
-              <Box sx={{
-                minHeight: 400,
-                maxHeight: 600,
-                overflowY: 'auto',
-                p: 1,
-                border: `2px dashed ${colors.border}`,
-                borderRadius: 2,
-              }}>
-                {loadingAgents ? (
-                  <Box sx={{ 
-                    display: 'flex', 
+        {/* Main Layout: Left (Agents) + Right (Workflow Canvas) */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 0, flex: 1, overflow: 'hidden' }}>
+          {/* LEFT: Available Agents Panel */}
+          <Box sx={{ borderRight: `1px solid ${colors.border}`, p: 2, overflowY: 'auto', bgcolor: isDark ? '#111' : '#f9fafb' }}>
+            <Typography sx={{ fontSize: 14, fontWeight: 700, color: colors.text, mb: 2 }}>
+              Available Agents ({availableAgents.length})
+            </Typography>
+            
+            <Droppable droppableId="available-agents" type="AGENTS">
+              {(provided) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  sx={{
+                    minHeight: '200px',
+                    display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    height: '400px',
-                    gap: 2,
-                  }}>
-                    <Typography sx={{ color: colors.textSecondary, fontSize: 14 }}>
-                      Loading agents from API...
-                    </Typography>
+                    gap: 1.5,
+                  }}
+                >
+                  {loadingAgents ? (
                     <Box sx={{ 
-                      width: 40, 
-                      height: 40, 
-                      border: `3px solid ${colors.border}`,
-                      borderTop: `3px solid #3b82f6`,
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite',
-                      '@keyframes spin': {
-                        '0%': { transform: 'rotate(0deg)' },
-                        '100%': { transform: 'rotate(360deg)' },
-                      }
-                    }} />
-                  </Box>
-                ) : (
-                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
-                    {availableAgents.map((agent) => (
-                      <AgentCard 
-                        key={agent.id} 
-                        agent={agent} 
-                        onClick={() => addAgent(agent)}
-                        showAdd={true}
-                      />
-                    ))}
-                  </Box>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      height: '300px',
+                      gap: 2,
+                    }}>
+                      <Typography sx={{ color: colors.textSecondary, fontSize: 12 }}>
+                        Loading agents...
+                      </Typography>
+                      <Box sx={{ 
+                        width: 30, 
+                        height: 30, 
+                        border: `2px solid ${colors.border}`,
+                        borderTop: `2px solid #3b82f6`,
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        '@keyframes spin': {
+                          '0%': { transform: 'rotate(0deg)' },
+                          '100%': { transform: 'rotate(360deg)' },
+                        }
+                      }} />
+                    </Box>
+                  ) : availableAgents.length === 0 ? (
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      height: 200,
+                      color: colors.textSecondary,
+                      fontStyle: 'italic',
+                      fontSize: 12
+                    }}>
+                      All agents added!
+                    </Box>
+                  ) : (
+                    <>
+                      {availableAgents.map((agent, index) => (
+                        <Draggable key={agent.id} draggableId={agent.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                cursor: 'grab',
+                                zIndex: snapshot.isDragging ? 9999 : 'auto',
+                                ...provided.draggableProps.style,
+                              }}
+                            >
+                              <Box
+                                sx={{ 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  gap: 1,
+                                  bgcolor: snapshot.isDragging ? agent.color : colors.cardBg,
+                                  border: `1px solid ${agent.color}`,
+                                  padding: '10px',
+                                  borderRadius: '8px',
+                                  transition: 'all 0.15s ease',
+                                  boxShadow: snapshot.isDragging ? `0 10px 25px rgba(0,0,0,0.4)` : '0 1px 2px rgba(0,0,0,0.1)',
+                                  transform: snapshot.isDragging ? 'scale(1.05)' : 'scale(1)',
+                                  cursor: snapshot.isDragging ? 'grabbing' : 'grab',
+                                  '&:hover': { 
+                                    boxShadow: `0 4px 12px ${agent.color}40`,
+                                  }
+                                }}
+                              >
+                                <Box sx={{ width: 28, height: 28, borderRadius: '6px', bgcolor: snapshot.isDragging ? 'rgba(255,255,255,0.2)' : `${agent.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                  <agent.icon sx={{ fontSize: 16, color: snapshot.isDragging ? '#fff' : agent.color }} />
+                                </Box>
+                                <Typography sx={{ fontSize: 12, fontWeight: 600, color: snapshot.isDragging ? '#fff' : colors.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {agent.label}
+                                </Typography>
+                              </Box>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </>
+                  )}
+                </Box>
+              )}
+            </Droppable>
+          </Box>
 
-          {/* Selected Pipeline */}
-          <Card sx={{ bgcolor: colors.cardBg, border: `1px solid ${colors.border}` }}>
-            <CardContent>
-              <Typography sx={{ fontSize: 16, fontWeight: 700, color: colors.text, mb: 2 }}>
-                Pipeline Sequence ({selectedAgents.length})
-              </Typography>
-              
-              <Box sx={{
-                minHeight: 400,
-                maxHeight: 600,
-                overflowY: 'auto',
-                p: 1,
-                border: `2px dashed ${colors.border}`,
-                borderRadius: 2,
-              }}>
-                {selectedAgents.length === 0 ? (
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    height: 200,
-                    color: colors.textSecondary,
-                    fontStyle: 'italic'
-                  }}>
-                    Click agents to add them to your pipeline
-                  </Box>
-                ) : (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    {selectedAgents.map((agent, index) => (
-                      <Box key={agent.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography sx={{ 
-                          fontSize: 12, 
-                          fontWeight: 700, 
-                          color: colors.textSecondary,
-                          minWidth: 24,
-                          textAlign: 'center'
-                        }}>
-                          {index + 1}
-                        </Typography>
-                        <Box sx={{ flex: 1 }}>
-                          <Card sx={{
-                            bgcolor: isDark ? '#2a2a2a' : '#fff',
-                            border: `2px solid ${isDark ? '#374151' : 'rgba(0,0,0,0.1)'}`,
-                            borderRadius: 2,
-                          }}>
-                            <CardContent sx={{ p: 1.5, '&:last-child': { pb: 1.5 } }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Box sx={{
-                                  width: 32, height: 32, borderRadius: '50%',
-                                  bgcolor: `${agent.color}18`,
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}>
-                                  <agent.icon sx={{ fontSize: 16, color: agent.color }} />
+          {/* RIGHT: Workflow Canvas - Free Placement */}
+          <Box sx={{ p: 3, overflowY: 'auto', position: 'relative' }}>
+            <Typography sx={{ fontSize: 14, fontWeight: 700, color: colors.text, mb: 2 }}>
+              Workflow Canvas ({selectedAgents.length})
+            </Typography>
+
+            <Droppable droppableId="selected-agents" type="AGENTS">
+              {(provided) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  sx={{
+                    minHeight: 'calc(100vh - 150px)',
+                    border: `2px dashed ${colors.border}`,
+                    borderRadius: 2,
+                    bgcolor: isDark ? '#0a0a0a' : '#fafbfc',
+                    p: 2,
+                    position: 'relative',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignContent: 'flex-start',
+                    gap: 2,
+                    '&:hover': {
+                      bgcolor: isDark ? '#111' : '#f0f4f8',
+                    }
+                  }}
+                >
+                  {selectedAgents.length === 0 ? (
+                    <Box sx={{ 
+                      width: '100%',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      minHeight: '400px',
+                      color: colors.textSecondary,
+                      fontStyle: 'italic',
+                      flexDirection: 'column',
+                      gap: 1,
+                      fontSize: 14
+                    }}>
+                      <Typography>📌 Drag agents here to add them</Typography>
+                      <Typography sx={{ fontSize: 12 }}>Place them anywhere on the canvas</Typography>
+                    </Box>
+                  ) : (
+                    <>
+                      {selectedAgents.map((agent, index) => (
+                        <Draggable key={agent.id} draggableId={agent.id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                cursor: snapshot.isDragging ? 'grabbing' : 'grab',
+                                zIndex: snapshot.isDragging ? 9999 : 'auto',
+                                ...provided.draggableProps.style,
+                              }}
+                            >
+                              <Box
+                                sx={{ 
+                                  display: 'inline-flex', 
+                                  alignItems: 'center', 
+                                  gap: 0.75,
+                                  bgcolor: snapshot.isDragging ? agent.color : colors.cardBg,
+                                  border: `2px solid ${agent.color}`,
+                                  padding: '6px 12px',
+                                  borderRadius: '20px',
+                                  transition: 'all 0.15s ease',
+                                  boxShadow: snapshot.isDragging ? `0 12px 30px rgba(0,0,0,0.4)` : '0 2px 4px rgba(0,0,0,0.1)',
+                                  transform: snapshot.isDragging ? 'scale(1.1)' : 'scale(1)',
+                                  cursor: snapshot.isDragging ? 'grabbing' : 'grab',
+                                  '&:hover': { 
+                                    boxShadow: `0 4px 12px ${agent.color}50`,
+                                  }
+                                }}
+                              >
+                                {/* Icon */}
+                                <Box sx={{ width: 18, height: 18, borderRadius: '4px', bgcolor: snapshot.isDragging ? 'rgba(255,255,255,0.2)' : `${agent.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                  <agent.icon sx={{ fontSize: 12, color: snapshot.isDragging ? '#fff' : agent.color }} />
                                 </Box>
-                                <Box sx={{ flex: 1, minWidth: 0 }}>
-                                  <Typography sx={{ fontSize: 12, fontWeight: 700, color: isDark ? '#e5e7eb' : '#111', lineHeight: 1.2 }}>
-                                    {agent.label}
-                                  </Typography>
-                                  <Typography sx={{ fontSize: 10, color: isDark ? '#9ca3af' : '#6b7280', lineHeight: 1.3, mt: 0.2 }}>
-                                    {agent.prompt ? 'Custom prompt configured' : agent.task.substring(0, 40) + '...'}
-                                  </Typography>
-                                  {agent.prompt && (
-                                    <Chip 
-                                      label="Custom Prompt" 
-                                      size="small" 
-                                      sx={{ 
-                                        mt: 0.5, 
-                                        height: 16, 
-                                        fontSize: 8, 
-                                        bgcolor: `${agent.color}20`, 
-                                        color: agent.color 
-                                      }} 
-                                    />
-                                  )}
-                                </Box>
+
+                                {/* Label */}
+                                <Typography sx={{ fontSize: 11, fontWeight: 600, color: snapshot.isDragging ? '#fff' : colors.text, whiteSpace: 'nowrap' }}>
+                                  {agent.label}
+                                </Typography>
+
+                                {/* Edit Button */}
                                 <IconButton
                                   size="small"
                                   onClick={() => openPromptDialog(agent)}
-                                  sx={{ color: agent.color }}
+                                  sx={{ 
+                                    color: snapshot.isDragging ? '#fff' : agent.color, 
+                                    p: '2px', 
+                                    minWidth: 'auto',
+                                    display: 'flex',
+                                  }}
                                 >
-                                  <EditIcon fontSize="small" />
+                                  <EditIcon sx={{ fontSize: 12 }} />
+                                </IconButton>
+
+                                {/* Remove Button */}
+                                <IconButton
+                                  size="small"
+                                  onClick={() => removeAgent(agent.id)}
+                                  sx={{ 
+                                    color: snapshot.isDragging ? '#fff' : '#DC2626', 
+                                    p: '2px', 
+                                    minWidth: 'auto',
+                                    display: 'flex',
+                                  }}
+                                >
+                                  <DeleteIcon sx={{ fontSize: 12 }} />
                                 </IconButton>
                               </Box>
-                            </CardContent>
-                          </Card>
-                        </Box>
-                        <IconButton
-                          size="small"
-                          onClick={() => removeAgent(agent.id)}
-                          sx={{ color: '#DC2626' }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </>
+                  )}
+                </Box>
+              )}
+            </Droppable>
+          </Box>
         </Box>
 
         {/* Prompt Dialog */}
@@ -879,6 +834,6 @@ app.add_middleware(
           </DialogActions>
         </Dialog>
       </Box>
-    </Box>
+    </DragDropContext>
   );
 }
